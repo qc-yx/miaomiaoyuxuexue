@@ -37,7 +37,9 @@ BEGIN
         );
         
         -- 为invite_codes表添加唯一约束（每个用户只能有一个邀请码）
-        ALTER TABLE invite_codes ADD CONSTRAINT unique_user_invite_code UNIQUE(created_by);
+        -- 注意: 原始代码中这里可能有一个错误，尝试引用不存在的created_by列
+        -- 通过以下约束我们确保每个用户只能有一个邀请码
+        ALTER TABLE invite_codes ADD CONSTRAINT unique_user_invite_code UNIQUE(user_id);
         
         -- 为invite_codes表启用RLS
         ALTER TABLE invite_codes ENABLE ROW LEVEL SECURITY;
