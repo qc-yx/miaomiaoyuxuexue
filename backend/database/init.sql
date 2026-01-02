@@ -201,101 +201,6 @@ CREATE POLICY "Users can create their own cuisine history" ON cuisine_history
 
 CREATE POLICY "Users can delete their own cuisine history" ON cuisine_history
   FOR DELETE USING (auth.uid() = user_id);
-CREATE POLICY "Users can view members of lists they are members of" ON list_members
-  FOR SELECT USING (EXISTS (
-    SELECT 1 FROM list_members AS lm
-    WHERE lm.list_id = list_members.list_id
-    AND lm.user_id = auth.uid()
-  ));
-
-CREATE POLICY "Users can add members to lists they own" ON list_members
-  FOR INSERT WITH CHECK (EXISTS (
-    SELECT 1 FROM shared_lists
-    WHERE shared_lists.id = list_members.list_id
-    AND shared_lists.owner_id = auth.uid()
-  ));
-
-CREATE POLICY "Users can update member roles in lists they own" ON list_members
-  FOR UPDATE USING (EXISTS (
-    SELECT 1 FROM shared_lists
-    WHERE shared_lists.id = list_members.list_id
-    AND shared_lists.owner_id = auth.uid()
-  ));
-
-CREATE POLICY "Users can remove members from lists they own" ON list_members
-  FOR DELETE USING (EXISTS (
-    SELECT 1 FROM shared_lists
-    WHERE shared_lists.id = list_members.list_id
-    AND shared_lists.owner_id = auth.uid()
-  ));
-
--- 创建笔记表
-CREATE TABLE IF NOT EXISTS notes (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  date VARCHAR(10) NOT NULL, -- 格式为 YYYY-MM-DD
-  content TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE(user_id, date)
-);
-
--- 为笔记表启用 RLS
-ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
-
--- 笔记表的 RLS 策略
-CREATE POLICY "Users can view their own notes" ON notes
-  FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can create their own notes" ON notes
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own notes" ON notes
-  FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own notes" ON notes
-  FOR DELETE USING (auth.uid() = user_id);
-
--- 为笔记表添加更新时间触发器
-CREATE TRIGGER update_notes_updated_at
-BEFORE UPDATE ON notes
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-
--- 创建 JWT 认证策略
-CREATE OR REPLACE FUNCTION check_user_role() RETURNS TRIGGER AS $$
-BEGIN
-  -- 这里可以添加自定义的角色检查逻辑
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- 创建更新时间触发器
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- 为用户表添加更新时间触发器
-CREATE TRIGGER update_users_updated_at
-BEFORE UPDATE ON users
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-
--- 为共享清单表添加更新时间触发器
-CREATE TRIGGER update_shared_lists_updated_at
-BEFORE UPDATE ON shared_lists
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-
--- 为清单项目表添加更新时间触发器
-CREATE TRIGGER update_list_items_updated_at
-BEFORE UPDATE ON list_items
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
 
 -- 创建运动表
 CREATE TABLE IF NOT EXISTS exercises (
@@ -368,6 +273,63 @@ CREATE POLICY "Users can create their own reminder settings" ON reminder_setting
 CREATE POLICY "Users can update their own reminder settings" ON reminder_settings
   FOR UPDATE USING (auth.uid() = user_id);
 
+-- 为笔记表启用 RLS
+ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
+
+-- 笔记表的 RLS 策略
+CREATE POLICY "Users can view their own notes" ON notes
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can create their own notes" ON notes
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own notes" ON notes
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own notes" ON notes
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- 为笔记表添加更新时间触发器
+CREATE TRIGGER update_notes_updated_at
+BEFORE UPDATE ON notes
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- 创建 JWT 认证策略
+CREATE OR REPLACE FUNCTION check_user_role() RETURNS TRIGGER AS $$
+BEGIN
+  -- 这里可以添加自定义的角色检查逻辑
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 创建更新时间触发器
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 为用户表添加更新时间触发器
+CREATE TRIGGER update_users_updated_at
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- 为共享清单表添加更新时间触发器
+CREATE TRIGGER update_shared_lists_updated_at
+BEFORE UPDATE ON shared_lists
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- 为清单项目表添加更新时间触发器
+CREATE TRIGGER update_list_items_updated_at
+BEFORE UPDATE ON list_items
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
 -- 为运动表添加更新时间触发器
 CREATE TRIGGER update_exercises_updated_at
 BEFORE UPDATE ON exercises
@@ -379,3 +341,42 @@ CREATE TRIGGER update_reminder_settings_updated_at
 BEFORE UPDATE ON reminder_settings
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+-- 创建笔记表
+CREATE TABLE IF NOT EXISTS notes (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  date VARCHAR(10) NOT NULL, -- 格式为 YYYY-MM-DD
+  content TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id, date)
+);
+
+CREATE POLICY "Users can view members of lists they are members of" ON list_members
+  FOR SELECT USING (EXISTS (
+    SELECT 1 FROM list_members AS lm
+    WHERE lm.list_id = list_members.list_id
+    AND lm.user_id = auth.uid()
+  ));
+
+CREATE POLICY "Users can add members to lists they own" ON list_members
+  FOR INSERT WITH CHECK (EXISTS (
+    SELECT 1 FROM shared_lists
+    WHERE shared_lists.id = list_members.list_id
+    AND shared_lists.owner_id = auth.uid()
+  ));
+
+CREATE POLICY "Users can update member roles in lists they own" ON list_members
+  FOR UPDATE USING (EXISTS (
+    SELECT 1 FROM shared_lists
+    WHERE shared_lists.id = list_members.list_id
+    AND shared_lists.owner_id = auth.uid()
+  ));
+
+CREATE POLICY "Users can remove members from lists they own" ON list_members
+  FOR DELETE USING (EXISTS (
+    SELECT 1 FROM shared_lists
+    WHERE shared_lists.id = list_members.list_id
+    AND shared_lists.owner_id = auth.uid()
+  ));
