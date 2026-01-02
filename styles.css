@@ -1,0 +1,217 @@
+/* 全局样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* 背景图样式 */
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./images/picture/1/ce5faa08fb11149c5ea1d7ba16a73bf9.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(0.8);
+    z-index: 1;
+}
+
+/* 表单容器 */
+.form-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 450px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 选项卡 */
+.tabs {
+    display: flex;
+    background: rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 18px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: #40c057;
+    transition: width 0.3s ease;
+}
+
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.tab-btn.active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.tab-btn.active::after {
+    width: 100%;
+}
+
+/* 表单内容 */
+.tab-content {
+    display: none;
+    padding: 30px;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 表单标题 */
+.tab-content h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* 表单组 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #40c057;
+    box-shadow: 0 0 0 3px rgba(64, 192, 87, 0.2);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* 选填字段样式 */
+.form-group.optional label::after {
+    content: ' (选填)';
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+}
+
+.form-group.optional input {
+    border-style: dashed;
+}
+
+/* 提交按钮 */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(64, 192, 87, 0.9) 0%, rgba(43, 138, 62, 0.9) 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(64, 192, 87, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* 响应式设计 */
+@media (max-width: 576px) {
+    .form-container {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .tab-content {
+        padding: 20px;
+    }
+    
+    .tab-btn {
+        padding: 14px;
+        font-size: 15px;
+    }
+}
+
+/* 表单验证样式 */
+input:invalid {
+    border-color: rgba(224, 49, 49, 0.8);
+}
+
+input:valid {
+    border-color: rgba(64, 192, 87, 0.8);
+}
+
+/* 输入框占位符样式 */
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
