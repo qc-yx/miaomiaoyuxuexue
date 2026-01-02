@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - 多功能应用</title>
+    <!-- 添加PWA优化的meta标签 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多功能应用">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('./images/picture/2/bd7a789b07d5d83d0bdedb57234fd252.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 页面容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 功能模块网格布局 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* 功能卡片样式 */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 100%);
+            transition: transform 0.3s ease;
+            transform: translateY(100%);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card:hover::before {
+            transform: translateY(0);
+        }
+
+        /* 功能图标 */
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 功能卡片标题 */
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.95);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 功能描述 */
+        .feature-description {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 返回登录按钮 */
+        .logout-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            background: rgba(245, 101, 101, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(245, 101, 101, 0.4);
+            color: rgba(255, 255, 255, 0.95);
+            padding: 15px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(252, 129, 129, 0.4);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .feature-card {
+                min-height: 200px;
+                padding: 30px 20px;
+            }
+
+            .feature-icon {
+                font-size: 3rem;
+            }
+        }
+
+        /* 小屏移动设备适配 */
+        @media (max-width: 480px) {
+            /* 优化容器内边距 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+            }
+
+            /* 调整功能卡片样式 */
+            .feature-card {
+                min-height: 180px;
+                padding: 25px 15px;
+            }
+
+            .feature-icon {
+                font-size: 2.5rem;
+                margin-bottom: 15px;
+            }
+
+            .feature-title {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+
+            .feature-description {
+                font-size: 0.85rem;
+            }
+
+            /* 调整按钮样式 */
+            .logout-btn {
+                width: 100%;
+                max-width: 200px;
+                padding: 12px 20px;
+                font-size: 14px;
+                border-radius: 25px;
+            }
+        }
+
+        /* 横屏设备适配 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            /* 调整功能卡片样式 */
+            .feature-grid {
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .feature-card {
+                min-height: 150px;
+                padding: 20px 15px;
+            }
+
+            .feature-icon {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+
+            .feature-title {
+                font-size: 1rem;
+                margin-bottom: 5px;
+            }
+
+            .feature-description {
+                font-size: 0.75rem;
+                line-height: 1.4;
+            }
+
+            /* 调整按钮大小 */
+            .logout-btn {
+                padding: 10px 16px;
+                font-size: 12px;
+                border-radius: 20px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            /* 移除悬停效果 */
+            .feature-card:hover {
+                transform: none;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            }
+
+            .feature-card:hover::before {
+                transform: translateY(100%);
+            }
+
+            .logout-btn:hover {
+                transform: none;
+                box-shadow: 0 5px 15px rgba(245, 101, 101, 0.3);
+            }
+
+            /* 增大触摸目标 */
+            .feature-card, .logout-btn {
+                min-width: 44px;
+                min-height: 44px;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">多功能应用</h1>
+        
+        <div class="feature-grid">
+            <!-- 转盘小游戏 -->
+            <a href="wheel.html" class="feature-card">
+                <div class="feature-icon">🎡</div>
+                <h2 class="feature-title">转盘小游戏</h2>
+                <p class="feature-description">
+                    自定义转盘选项和主题，享受随机抽奖的乐趣。支持添加、删除选项，更换主题颜色。
+                </p>
+            </a>
+            
+            <!-- 今日菜系 -->
+            <a href="cuisine.html" class="feature-card">
+                <div class="feature-icon">🍜</div>
+                <h2 class="feature-title">今日菜系</h2>
+                <p class="feature-description">
+                    随机推荐不同菜系和菜品，支持自定义菜系分类和菜品管理，记录推荐历史。
+                </p>
+            </a>
+            
+            <!-- 记事本 -->
+            <a href="notes.html" class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h2 class="feature-title">记事本</h2>
+                <p class="feature-description">
+                    多笔记管理，支持自定义字体大小、行高和主题颜色，支持笔记导入导出。
+                </p>
+            </a>
+            
+            <!-- 今日运动 -->
+            <a href="exercise.html" class="feature-card">
+                <div class="feature-icon">🏃</div>
+                <h2 class="feature-title">今日运动</h2>
+                <p class="feature-description">
+                    运动计划管理，支持添加、删除运动项目，记录完成状态，查看统计数据。
+                </p>
+            </a>
+        </div>
+        
+        <!-- 按钮容器 -->
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <a href="index.html" class="logout-btn">返回登录</a>
+            <a href="invite.html" class="logout-btn" style="background: rgba(76, 175, 80, 0.2); box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3); border-color: rgba(76, 175, 80, 0.4);">
+                邀请码
+            </a>
+        </div>
+    </div>
+    <script src="script-github-pages.js"></script>
+    <script>
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查是否有登录信息（使用与authAPI一致的检查方式）
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            
+            if (!isLoggedIn) {
+                // 如果没有登录，跳转到登录页面
+                window.location.assign('index.html');
+                return;
+            }
+            
+            // 登出功能
+            const logoutBtn = document.querySelector('.logout-btn[href="index.html"]');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 清除localStorage中的登录信息（使用与authAPI一致的清除方式）
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    
+                    // 跳转到登录页面
+                    window.location.assign('index.html');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
