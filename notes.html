@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📅 日历记事本</title>
+    <!-- 添加PWA优化的meta标签 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多功能应用">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('images/picture/5/0d3f7ee7aa3e8aaf300ec9de7f5e72ed.jpg') center/cover no-repeat;
+    min-height: 100vh;
+    color: #333;
+}
+
+        /* 页面容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 导航按钮 */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: start;
+        }
+
+        /* 功能卡片样式 */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* 功能卡片标题 */
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        /* 日历导航 */
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-arrow {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-arrow:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+
+        .current-month {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* 日历网格 */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header {
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+            color: #4a5568;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f7fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .calendar-day:hover {
+            background: #ebf8ff;
+            transform: translateY(-2px);
+        }
+
+        .calendar-day.today {
+            background: #4299e1;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.selected {
+            background: #48bb78;
+            color: white;
+            border-color: #38a169;
+            font-weight: 600;
+        }
+
+        .calendar-day.other-month {
+            color: #a0aec0;
+            background: #edf2f7;
+        }
+
+        .calendar-day.has-note {
+            background: #fef5e7;
+            border-color: #ed8936;
+        }
+
+        .note-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background: #ed8936;
+            border-radius: 50%;
+        }
+
+        /* 笔记编辑器 */
+        .editor-section {
+            margin-bottom: 20px;
+        }
+
+        .note-date {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a5568;
+            text-align: center;
+        }
+
+        .note-textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+
+        .note-textarea:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        /* 按钮样式 */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .action-btn.delete {
+            background: linear-gradient(135deg, #fc8181, #f56565);
+        }
+
+        .action-btn.delete:hover {
+            box-shadow: 0 5px 15px rgba(252, 129, 129, 0.4);
+        }
+
+        /* 自定义设置区域 */
+        .customization-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        /* 编辑器设置 */
+        .editor-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .setting-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .setting-select:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        /* 所有记事列表样式 */
+        .all-notes-container {
+            margin-top: 30px;
+        }
+
+        .notes-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .note-item {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #4299e1;
+        }
+
+        .note-item:hover {
+            background: #ebf8ff;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-date-header {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .note-preview {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .editor-settings {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-day {
+                font-size: 14px;
+            }
+        }
+
+        /* 小屏移动设备适配 */
+        @media (max-width: 480px) {
+            /* 优化容器内边距 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            /* 调整导航按钮布局 */
+            .nav-buttons {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 14px;
+                border-radius: 20px;
+            }
+
+            /* 调整功能卡片内边距 */
+            .feature-card {
+                padding: 20px;
+            }
+
+            /* 调整卡片标题大小 */
+            .feature-title {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+
+            /* 调整日历样式 */
+            .calendar-grid {
+                gap: 4px;
+            }
+
+            .calendar-header {
+                padding: 8px 4px;
+                font-size: 12px;
+                border-radius: 6px;
+            }
+
+            .calendar-day {
+                font-size: 12px;
+                aspect-ratio: auto;
+                min-height: 36px;
+            }
+
+            /* 调整笔记编辑器 */
+            .note-textarea {
+                height: 250px;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            /* 调整按钮样式 */
+            .nav-arrow, .action-btn, .setting-select {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+
+            /* 调整按钮容器 */
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            /* 调整设置项 */
+            .editor-settings {
+                gap: 10px;
+            }
+
+            .setting-item {
+                margin-bottom: 10px;
+            }
+
+            .setting-label {
+                font-size: 14px;
+            }
+
+            /* 调整笔记列表项 */
+            .note-item {
+                padding: 12px;
+            }
+
+            .note-date-header {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            .note-preview {
+                font-size: 13px;
+            }
+        }
+
+        /* 横屏设备适配 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            /* 调整容器内边距 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            /* 调整导航按钮 */
+            .nav-buttons {
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .nav-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* 调整功能卡片 */
+            .feature-card {
+                padding: 15px;
+            }
+
+            .feature-title {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            /* 调整日历样式 */
+            .calendar-grid {
+                gap: 4px;
+            }
+
+            .calendar-header, .calendar-day {
+                padding: 6px;
+                font-size: 12px;
+            }
+
+            .calendar-day {
+                min-height: 30px;
+            }
+
+            /* 调整笔记编辑器 */
+            .note-textarea {
+                height: 200px;
+                padding: 10px;
+            }
+
+            /* 调整按钮大小 */
+            .nav-arrow, .action-btn, .setting-select {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* 调整笔记列表 */
+            .notes-list {
+                max-height: 250px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            /* 移除悬停效果 */
+            .nav-btn:hover, .nav-arrow:hover, .calendar-day:hover, .note-item:hover, .action-btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .note-item:hover {
+                background: #f7fafc;
+                transform: none;
+            }
+
+            /* 增大触摸目标 */
+            .nav-btn, .nav-arrow, .calendar-day, .action-btn, .setting-select, .counter-btn {
+                min-width: 44px;
+                min-height: 44px;
+                cursor: pointer;
+            }
+        }
+
+        /* 计数器样式 */
+        .counters-section {
+            margin-top: 30px;
+        }
+
+        .counters-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .counters-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .counter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .counter-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 计数器头部样式 */
+        .counter-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* 计数器控制区域 */
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 10px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 计数器控制按钮样式 */
+        .counter-control-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* 加按钮样式 */
+        .counter-control-btn.increment {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        /* 减按钮样式 */
+        .counter-control-btn.decrement {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        /* 按钮悬停效果 */
+        .counter-control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 按钮点击效果 */
+        .counter-control-btn:active {
+            transform: translateY(0);
+        }
+
+        .counter-value {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        /* 响应式计数器布局 */
+        @media (max-width: 768px) {
+            .counters-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">📅 日历记事本</h1>
+        
+        <!-- 导航按钮 -->
+        <div class="nav-buttons">
+            <a href="main.html" class="nav-btn">返回首页</a>
+            <a href="wheel.html" class="nav-btn">转盘游戏</a>
+            <a href="cuisine.html" class="nav-btn">今日菜系</a>
+            <a href="exercise.html" class="nav-btn">今日运动</a>
+        </div>
+        
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 日历区域 -->
+            <div class="feature-card">
+                <h2 class="feature-title">日历</h2>
+                
+                <!-- 日历导航 -->
+                <div class="calendar-nav">
+                    <button class="nav-arrow" id="prev-month">‹</button>
+                    <div class="current-month" id="current-month"></div>
+                    <button class="nav-arrow" id="next-month">›</button>
+                </div>
+                
+                <!-- 日历网格 -->
+                <div class="calendar-grid" id="calendar-grid">
+                    <!-- 日历标题 -->
+                    <div class="calendar-header">日</div>
+                    <div class="calendar-header">一</div>
+                    <div class="calendar-header">二</div>
+                    <div class="calendar-header">三</div>
+                    <div class="calendar-header">四</div>
+                    <div class="calendar-header">五</div>
+                    <div class="calendar-header">六</div>
+                    <!-- 日历天数将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 笔记编辑区域 -->
+            <div class="feature-card">
+                <h2 class="feature-title">笔记编辑</h2>
+                
+                <!-- 选择的日期 -->
+                <div class="note-date" id="selected-date"></div>
+                
+                <!-- 笔记编辑器 -->
+                <div class="editor-section">
+                    <textarea class="note-textarea" id="note-content" placeholder="在这里记录你的想法..."></textarea>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" id="save-note">保存笔记</button>
+                    <button class="action-btn delete" id="delete-note">删除笔记</button>
+                </div>
+                
+                <!-- 自定义设置区域 -->
+                <div class="customization-section">
+                    <h3 class="section-title">编辑器设置</h3>
+                    <div class="editor-settings">
+                        <div class="setting-item">
+                            <label class="setting-label">字体大小</label>
+                            <select id="font-size">
+                                <option value="14px">14px</option>
+                                <option value="16px" selected>16px</option>
+                                <option value="18px">18px</option>
+                                <option value="20px">20px</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">行高</label>
+                            <select id="line-height">
+                                <option value="1.4">1.4</option>
+                                <option value="1.6" selected>1.6</option>
+                                <option value="1.8">1.8</option>
+                                <option value="2.0">2.0</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            
+            <!-- 计数按钮区域 -->
+            <div class="counters-section">
+                <h3 class="counters-title">惩罚计数器</h3>
+                <div class="counters-grid">
+                    <!-- 渺渺惩罚 -->
+                    <div class="counter-item">
+                        <div class="counter-header">渺渺惩罚</div>
+                        <div class="counter-controls">
+                            <button class="counter-control-btn decrement" data-type="miaomiao-punish">-</button>
+                            <span class="counter-value" id="miaomiao-punish-count">0</span>
+                            <button class="counter-control-btn increment" data-type="miaomiao-punish">+</button>
+                        </div>
+                    </div>
+                    <!-- 渺渺的超级惩罚 -->
+                    <div class="counter-item">
+                        <div class="counter-header">渺渺的超级惩罚</div>
+                        <div class="counter-controls">
+                            <button class="counter-control-btn decrement" data-type="miaomiao-super-punish">-</button>
+                            <span class="counter-value" id="miaomiao-super-punish-count">0</span>
+                            <button class="counter-control-btn increment" data-type="miaomiao-super-punish">+</button>
+                        </div>
+                    </div>
+                    <!-- 雪雪的惩罚 -->
+                    <div class="counter-item">
+                        <div class="counter-header">雪雪的惩罚</div>
+                        <div class="counter-controls">
+                            <button class="counter-control-btn decrement" data-type="xuexue-punish">-</button>
+                            <span class="counter-value" id="xuexue-punish-count">0</span>
+                            <button class="counter-control-btn increment" data-type="xuexue-punish">+</button>
+                        </div>
+                    </div>
+                    <!-- 雪雪的超级惩罚 -->
+                    <div class="counter-item">
+                        <div class="counter-header">雪雪的超级惩罚</div>
+                        <div class="counter-controls">
+                            <button class="counter-control-btn decrement" data-type="xuexue-super-punish">-</button>
+                            <span class="counter-value" id="xuexue-super-punish-count">0</span>
+                            <button class="counter-control-btn increment" data-type="xuexue-super-punish">+</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="reset-btn" id="reset-counters">重置所有计数器</button>
+            </div>
+            </div>
+        </div>
+        
+        <!-- 所有记事区域 -->
+        <div class="feature-card all-notes-container">
+            <h2 class="feature-title">所有记事</h2>
+            <div class="notes-list" id="notes-list">
+                <!-- 所有笔记将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script-github-pages.js"></script>
+        <script>
+        // DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化变量
+            let currentDate = new Date();
+            let selectedDate = new Date();
+            let notes = {};
+            
+            // 获取DOM元素
+            const calendarGrid = document.getElementById('calendar-grid');
+            const currentMonth = document.getElementById('current-month');
+            const prevMonthBtn = document.getElementById('prev-month');
+            const nextMonthBtn = document.getElementById('next-month');
+            const selectedDateDisplay = document.getElementById('selected-date');
+            const noteContent = document.getElementById('note-content');
+            const saveNoteBtn = document.getElementById('save-note');
+            const deleteNoteBtn = document.getElementById('delete-note');
+            const fontSizeSelect = document.getElementById('font-size');
+            const lineHeightSelect = document.getElementById('line-height');
+            const notesList = document.getElementById('notes-list');
+            
+            // 格式化日期为 YYYY-MM-DD
+            function formatDate(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            
+            // 从API加载所有笔记
+            async function loadNotes() {
+                try {
+                    const response = await notesAPI.getNotes();
+                    // 后端已经返回了 { 'YYYY-MM-DD': '内容' } 格式，直接使用
+                    notes = response;
+                    generateCalendar();
+                    generateAllNotesList();
+                } catch (error) {
+                    console.error('加载笔记失败:', error);
+                    notes = {};
+                }
+            }
+            
+            // 生成日历
+            function generateCalendar() {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                
+                // 更新当前月份显示
+                currentMonth.textContent = `${year}年${month + 1}月`;
+                
+                // 清空现有日历天数
+                const existingDays = calendarGrid.querySelectorAll('.calendar-day');
+                existingDays.forEach(day => day.remove());
+                
+                // 获取当月第一天
+                const firstDay = new Date(year, month, 1);
+                // 获取当月最后一天
+                const lastDay = new Date(year, month + 1, 0);
+                // 获取当月第一天是星期几
+                const startDay = firstDay.getDay();
+                // 获取当月总天数
+                const totalDays = lastDay.getDate();
+                // 获取上个月最后一天
+                const prevMonthLastDay = new Date(year, month, 0);
+                // 上个月总天数
+                const prevMonthTotalDays = prevMonthLastDay.getDate();
+                
+                // 生成日历天数
+                // 生成上个月的天数
+                for (let i = startDay - 1; i >= 0; i--) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day other-month';
+                    dayElement.textContent = prevMonthTotalDays - i;
+                    calendarGrid.appendChild(dayElement);
+                }
+                
+                // 生成当月天数
+                for (let day = 1; day <= totalDays; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = day;
+                    
+                    const date = new Date(year, month, day);
+                    const dateStr = formatDate(date);
+                    
+                    // 标记今天
+                    if (isToday(date)) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    // 标记选中日期
+                    if (isSameDay(date, selectedDate)) {
+                        dayElement.classList.add('selected');
+                    }
+                    
+                    // 检查是否有笔记
+                    if (notes[dateStr]) {
+                        dayElement.classList.add('has-note');
+                        const indicator = document.createElement('div');
+                        indicator.className = 'note-indicator';
+                        dayElement.appendChild(indicator);
+                    }
+                    
+                    // 添加点击事件
+                    dayElement.addEventListener('click', () => {
+                        selectDate(date);
+                    });
+                    
+                    calendarGrid.appendChild(dayElement);
+                }
+                
+                // 生成下个月的天数
+                const remainingDays = 42 - (startDay + totalDays);
+                for (let day = 1; day <= remainingDays; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day other-month';
+                    dayElement.textContent = day;
+                    calendarGrid.appendChild(dayElement);
+                }
+            }
+            
+            // 生成所有记事列表
+            function generateAllNotesList() {
+                // 清空现有列表
+                notesList.innerHTML = '';
+                
+                // 检查是否有笔记
+                if (Object.keys(notes).length === 0) {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.style.textAlign = 'center';
+                    emptyMessage.style.padding = '20px';
+                    emptyMessage.style.color = '#718096';
+                    emptyMessage.textContent = '暂无记事，点击日历上的日期开始记录吧！';
+                    notesList.appendChild(emptyMessage);
+                    return;
+                }
+                
+                // 按日期排序笔记（从新到旧）
+                const sortedDates = Object.keys(notes).sort((a, b) => new Date(b) - new Date(a));
+                
+                // 生成笔记列表
+                sortedDates.forEach(dateStr => {
+                    const noteItem = document.createElement('div');
+                    noteItem.className = 'note-item';
+                    
+                    // 解析日期字符串为Date对象
+                    const dateParts = dateStr.split('-');
+                    const date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+                    
+                    // 格式化显示日期
+                    const displayDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+                    
+                    // 生成笔记项HTML
+                    noteItem.innerHTML = `
+                        <div class="note-date-header">${displayDate}</div>
+                        <div class="note-preview">${notes[dateStr]}</div>
+                    `;
+                    
+                    // 添加点击事件
+                    noteItem.addEventListener('click', () => {
+                        selectDate(date);
+                    });
+                    
+                    notesList.appendChild(noteItem);
+                });
+            }
+            
+            // 判断是否是今天
+            function isToday(date) {
+                const today = new Date();
+                return isSameDay(date, today);
+            }
+            
+            // 判断两个日期是否相同
+            function isSameDay(date1, date2) {
+                return date1.getFullYear() === date2.getFullYear() &&
+                       date1.getMonth() === date2.getMonth() &&
+                       date1.getDate() === date2.getDate();
+            }
+            
+            // 选择日期
+            async function selectDate(date) {
+                selectedDate = date;
+                const dateStr = formatDate(selectedDate);
+                
+                // 更新选中日期显示
+                selectedDateDisplay.textContent = `${selectedDate.getFullYear()}年${selectedDate.getMonth() + 1}月${selectedDate.getDate()}日`;
+                
+                // 加载笔记
+                try {
+                    const response = await notesAPI.getNote(dateStr);
+                    noteContent.value = response.content || '';
+                } catch (error) {
+                    console.error('加载单个笔记失败:', error);
+                    noteContent.value = notes[dateStr] || '';
+                }
+                
+                // 更新日历选中状态
+                generateCalendar();
+            }
+            
+            // 保存笔记
+            async function saveNote() {
+                const dateStr = formatDate(selectedDate);
+                const content = noteContent.value;
+                
+                try {
+                    await notesAPI.saveNote(dateStr, content);
+                    // 更新本地缓存
+                    if (content.trim()) {
+                        notes[dateStr] = content;
+                    } else {
+                        delete notes[dateStr];
+                    }
+                    generateCalendar();
+                    generateAllNotesList();
+                    alert('笔记已保存！');
+                } catch (error) {
+                    console.error('保存笔记失败:', error);
+                    alert('保存笔记失败，请稍后重试！');
+                }
+            }
+            
+            // 删除笔记
+            async function deleteNote() {
+                const dateStr = formatDate(selectedDate);
+                
+                if (notes[dateStr]) {
+                    if (confirm('确定要删除这篇笔记吗？')) {
+                        try {
+                            await notesAPI.deleteNote(dateStr);
+                            // 更新本地缓存
+                            delete notes[dateStr];
+                            noteContent.value = '';
+                            generateCalendar();
+                            generateAllNotesList();
+                            alert('笔记已删除！');
+                        } catch (error) {
+                            console.error('删除笔记失败:', error);
+                            alert('删除笔记失败，请稍后重试！');
+                        }
+                    }
+                } else {
+                    alert('这一天没有笔记！');
+                }
+            }
+            
+            // 上一个月
+            function prevMonth() {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                generateCalendar();
+            }
+            
+            // 下一个月
+            function nextMonth() {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                generateCalendar();
+                
+            }
+            
+            // 更新编辑器设置
+            function updateEditorSettings() {
+                noteContent.style.fontSize = fontSizeSelect.value;
+                noteContent.style.lineHeight = lineHeightSelect.value;
+                localStorage.setItem('notesFontSize', fontSizeSelect.value);
+                localStorage.setItem('notesLineHeight', lineHeightSelect.value);
+            }
+            
+            // 加载保存的编辑器设置
+            function loadEditorSettings() {
+                fontSizeSelect.value = localStorage.getItem('notesFontSize') || '16px';
+                lineHeightSelect.value = localStorage.getItem('notesLineHeight') || '1.6';
+                updateEditorSettings();
+            }
+            
+            // 添加事件监听器
+            prevMonthBtn.addEventListener('click', prevMonth);
+            nextMonthBtn.addEventListener('click', nextMonth);
+            saveNoteBtn.addEventListener('click', saveNote);
+            deleteNoteBtn.addEventListener('click', deleteNote);
+            fontSizeSelect.addEventListener('change', updateEditorSettings);
+            lineHeightSelect.addEventListener('change', updateEditorSettings);
+            
+            // 回车键保存笔记
+            noteContent.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    saveNote();
+                }
+            });
+            
+            // 计数器功能实现（连接后端API）
+            let counters = {
+                'miaomiao-punish': 0,
+                'miaomiao-super-punish': 0,
+                'xuexue-punish': 0,
+                'xuexue-super-punish': 0
+            };
+
+            // 获取计数器显示元素
+            const counterDisplays = {
+                'miaomiao-punish': document.getElementById('miaomiao-punish-count'),
+                'miaomiao-super-punish': document.getElementById('miaomiao-super-punish-count'),
+                'xuexue-punish': document.getElementById('xuexue-punish-count'),
+                'xuexue-super-punish': document.getElementById('xuexue-super-punish-count')
+            };
+
+            // 从后端API获取计数器数据
+            async function loadCounters() {
+                try {
+                    const data = await countersAPI.getCounters();
+                    console.log('从API获取计数器数据成功:', data);
+                    counters = data.counters;
+                    // 更新显示
+                    Object.keys(counters).forEach(key => {
+                        counterDisplays[key].textContent = counters[key];
+                    });
+                } catch (error) {
+                    console.error('获取计数器数据出错:', error);
+                }
+            }
+
+            // 更新计数器（调用后端API）
+            async function updateCounter(type, operation) {
+                try {
+                    const data = await countersAPI.updateCounter(type, operation);
+                    // 更新本地计数器数据
+                    counters[type] = data.value;
+                    counterDisplays[type].textContent = data.value;
+                } catch (error) {
+                    console.error('更新计数器失败:', error);
+                    alert('更新计数器失败，请稍后重试！');
+                }
+            }
+
+            // 重置所有计数器（调用后端API）
+            async function resetAllCounters() {
+                if (!confirm('确定要重置所有计数器吗？')) {
+                    return;
+                }
+                
+                try {
+                    const data = await countersAPI.resetAllCounters();
+                    // 重置本地计数器数据
+                    Object.keys(counters).forEach(key => {
+                        counters[key] = 0;
+                        counterDisplays[key].textContent = '0';
+                    });
+                    alert('所有计数器已重置！');
+                } catch (error) {
+                    console.error('重置计数器失败:', error);
+                    alert('重置计数器失败，请稍后重试！');
+                }
+            }
+
+            // 添加计数器事件监听器
+            document.querySelectorAll('.counter-control-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const type = e.target.dataset.type;
+                    const operation = e.target.classList.contains('increment') ? 'increment' : 'decrement';
+                    updateCounter(type, operation);
+                });
+            });
+
+            // 重置按钮事件
+            document.getElementById('reset-counters').addEventListener('click', resetAllCounters);
+
+            // 初始化计数器
+            loadCounters();
+
+            // 定期自动同步计数器数据（每分钟）
+            setInterval(() => {
+                console.log('自动同步计数器数据');
+                loadCounters();
+            }, 60000);
+
+            // 初始化
+            loadEditorSettings();
+            selectDate(new Date());
+            loadNotes(); // 加载所有笔记
+            generateCalendar();
+            generateAllNotesList();
+        });
+    </script>
+</body>
+</html>
