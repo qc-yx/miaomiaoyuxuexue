@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪 今日运动</title>
+    <!-- 添加PWA优化的meta标签 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多功能应用">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('images/picture/6/2f12b26355cc165dea987d7c1eeb5379.jpg') center/cover no-repeat;
+    min-height: 100vh;
+    color: #333;
+}
+
+        /* 页面容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 导航按钮 */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: start;
+        }
+
+        /* 功能卡片样式 */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* 功能卡片标题 */
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        /* 运动列表区域 */
+        .exercise-list-container {
+            margin-bottom: 20px;
+        }
+
+        .exercise-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+
+        .exercise-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .exercise-item.completed {
+            background: #c6f6d5;
+            border-color: #48bb78;
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+
+        .exercise-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .exercise-checkbox {
+            transform: scale(1.2);
+        }
+
+        .exercise-details {
+            flex: 1;
+        }
+
+        .exercise-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 3px;
+        }
+
+        .exercise-meta {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        /* 统计信息 */
+        .stats-section {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* 添加运动表单 */
+        .add-exercise-form {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #a0aec0, #718096);
+        }
+
+        .btn.secondary:hover {
+            box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #fc8181, #f56565);
+        }
+
+        .btn.danger:hover {
+            box-shadow: 0 5px 15px rgba(252, 129, 129, 0.4);
+        }
+
+        /* 自定义设置区域 */
+        .customization-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        /* 运动类型管理 */
+        .exercise-types {
+            margin-bottom: 20px;
+        }
+
+        .type-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .type-tag {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .type-tag:hover {
+            background: #cbd5e0;
+        }
+
+        .type-tag.active {
+            background: #4299e1;
+            color: white;
+        }
+
+        /* 添加类型表单 */
+        .add-type-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .exercise-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .exercise-info {
+                width: 100%;
+            }
+        }
+
+        /* 小屏移动设备适配 */
+        @media (max-width: 480px) {
+            /* 优化容器内边距 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            /* 调整导航按钮布局 */
+            .nav-buttons {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 14px;
+                border-radius: 20px;
+            }
+
+            /* 调整功能卡片内边距 */
+            .feature-card {
+                padding: 20px;
+            }
+
+            /* 调整卡片标题大小 */
+            .feature-title {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+
+            /* 调整统计信息 */
+            .stats-section {
+                padding: 15px;
+            }
+
+            .stats-grid {
+                gap: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.6rem;
+            }
+
+            /* 调整添加运动表单 */
+            .add-exercise-form {
+                padding: 15px;
+            }
+
+            /* 调整选项卡按钮 */
+            #pending-tab, #completed-tab {
+                padding: 10px 16px;
+                font-size: 14px;
+                flex: 1;
+            }
+
+            /* 调整运动列表项 */
+            .exercise-item {
+                padding: 12px;
+            }
+
+            .exercise-name {
+                font-size: 14px;
+            }
+
+            .exercise-meta {
+                font-size: 12px;
+            }
+
+            /* 调整按钮样式 */
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            /* 调整按钮组 */
+            div[style="display: flex; gap: 10px;"] {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            /* 调整运动类型标签 */
+            .type-tag {
+                padding: 6px 12px;
+                font-size: 12px;
+                border-radius: 15px;
+            }
+
+            /* 调整添加类型表单 */
+            .add-type-form {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            /* 调整提醒设置 */
+            div[style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;"] {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            div[style="display: flex; gap: 10px;"] {
+                flex-direction: column;
+            }
+
+            /* 调整筛选和排序表单 */
+            .customization-section .form-row {
+                gap: 10px;
+            }
+
+            .setting-item {
+                margin-bottom: 12px;
+            }
+
+            .setting-label {
+                font-size: 14px;
+            }
+        }
+
+        /* 横屏设备适配 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            /* 调整容器内边距 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            /* 调整导航按钮 */
+            .nav-buttons {
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .nav-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* 调整功能卡片 */
+            .feature-card {
+                padding: 15px;
+            }
+
+            .feature-title {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            /* 调整统计信息 */
+            .stats-section {
+                padding: 15px;
+            }
+
+            .stats-grid {
+                gap: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.4rem;
+            }
+
+            /* 调整运动列表 */
+            .exercise-list {
+                max-height: 200px;
+                overflow-y: auto;
+            }
+
+            .exercise-item {
+                padding: 12px;
+            }
+
+            /* 调整表单和按钮 */
+            .add-exercise-form {
+                padding: 15px;
+            }
+
+            .form-row {
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 12px;
+            }
+
+            /* 调整类型标签 */
+            .type-tag {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            /* 移除悬停效果 */
+            .nav-btn:hover, .btn:hover, .type-tag:hover, .exercise-item:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .type-tag:hover {
+                background: #e2e8f0;
+            }
+
+            .exercise-item:hover {
+                background: #f7fafc;
+            }
+
+            /* 增大触摸目标 */
+            .nav-btn, .btn, .type-tag, .exercise-checkbox, .form-input, select {
+                min-width: 44px;
+                min-height: 44px;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">🏃 今日运动</h1>
+        
+        <!-- 导航按钮 -->
+        <div class="nav-buttons">
+            <a href="main.html" class="nav-btn">返回首页</a>
+            <a href="wheel.html" class="nav-btn">转盘游戏</a>
+            <a href="cuisine.html" class="nav-btn">今日菜系</a>
+            <a href="notes.html" class="nav-btn">记事本</a>
+        </div>
+        
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 运动管理区域 -->
+            <div class="feature-card">
+                <h2 class="feature-title">运动列表</h2>
+                
+                <!-- 统计信息 -->
+                <div class="stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-exercises">0</div>
+                            <div class="stat-label">总运动数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completed-exercises">0</div>
+                            <div class="stat-label">已完成</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="pending-exercises">0</div>
+                            <div class="stat-label">待完成</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completion-rate">0%</div>
+                            <div class="stat-label">完成率</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 添加运动表单 -->
+                <div class="add-exercise-form">
+                    <h3 class="section-title">添加运动</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">运动名称</label>
+                            <input type="text" class="form-input" id="exercise-name" placeholder="例如：跑步">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">运动类型</label>
+                            <select class="form-input" id="exercise-type">
+                                <option value="有氧运动">有氧运动</option>
+                                <option value="力量训练">力量训练</option>
+                                <option value="柔韧性训练">柔韧性训练</option>
+                                <option value="平衡训练">平衡训练</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">时长 (分钟)</label>
+                            <input type="number" class="form-input" id="exercise-duration" placeholder="例如：30">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">强度</label>
+                            <select class="form-input" id="exercise-intensity">
+                                <option value="低">低</option>
+                                <option value="中" selected>中</option>
+                                <option value="高">高</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn" id="add-exercise">添加运动</button>
+                </div>
+                
+                <!-- 运动列表选项卡 -->
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn" id="pending-tab" style="background: #4299e1;">待完成运动</button>
+                        <button class="btn" id="completed-tab" style="background: #48bb78;">已完成运动</button>
+                    </div>
+                    
+                    <!-- 待完成运动列表 -->
+                    <div class="exercise-list-container" id="pending-list-container">
+                        <h3 class="section-title">待完成运动</h3>
+                        <ul class="exercise-list" id="pending-exercise-list">
+                            <!-- 待完成运动项目将通过JavaScript动态生成 -->
+                        </ul>
+                    </div>
+                    
+                    <!-- 已完成运动列表 -->
+                    <div class="exercise-list-container" id="completed-list-container" style="display: none;">
+                        <h3 class="section-title">已完成运动</h3>
+                        <ul class="exercise-list" id="completed-exercise-list">
+                            <!-- 已完成运动项目将通过JavaScript动态生成 -->
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 每日提醒设置 -->
+                <div class="customization-section">
+                    <h3 class="section-title">每日提醒</h3>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="reminder-toggle"> 启用每日提醒
+                        </label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="time" id="reminder-time" style="padding: 8px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                            <button class="btn" id="save-reminder" style="padding: 8px 15px; font-size: 14px;">保存提醒</button>
+                        </div>
+                    </div>
+                    <div id="reminder-status" style="font-size: 14px; color: #718096;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn secondary" id="clear-completed">清除已完成</button>
+                    <button class="btn danger" id="clear-all">清除所有</button>
+                </div>
+            </div>
+            
+            <!-- 自定义设置区域 -->
+            <div class="feature-card">
+                <h2 class="feature-title">自定义设置</h2>
+                
+                <div class="customization-section">
+                    <h3 class="section-title">运动类型管理</h3>
+                    <div class="type-list" id="type-list">
+                        <!-- 运动类型标签将通过JavaScript动态生成 -->
+                    </div>
+                    <div class="add-type-form">
+                        <input type="text" class="form-input" id="new-type" placeholder="输入新运动类型">
+                        <button class="btn" id="add-type">添加类型</button>
+                    </div>
+                </div>
+                
+                <div class="customization-section">
+                    <h3 class="section-title">筛选和排序</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">筛选条件</label>
+                            <select class="form-input" id="filter-type">
+                                <option value="all">全部</option>
+                                <option value="completed">已完成</option>
+                                <option value="pending">待完成</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">排序方式</label>
+                            <select class="form-input" id="sort-by">
+                                <option value="created" selected>创建时间</option>
+                                <option value="name">运动名称</option>
+                                <option value="duration">运动时长</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn" id="apply-filters">应用筛选</button>
+                </div>
+                
+                <div class="customization-section">
+                    <h3 class="section-title">数据管理</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn secondary" id="export-data">导出数据</button>
+                        <button class="btn secondary" id="import-data">导入数据</button>
+                        <button class="btn danger" id="reset-data">重置数据</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script-github-pages.js"></script>
+    <script>
+        // DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 初始化变量
+            let exercises = [];
+            let exerciseTypes = ['有氧运动', '力量训练', '柔韧性训练', '平衡训练'];
+            let currentFilter = 'all';
+            let currentSort = 'created';
+            
+            // 每日提醒设置
+            let reminderSettings = {
+                enabled: false,
+                time: '09:00'
+            };
+
+            // 加载提醒设置
+            async function loadReminderSettings() {
+                try {
+                    const data = await exercisesAPI.getReminderSettings();
+                    reminderSettings = data;
+                } catch (error) {
+                    console.error('加载提醒设置失败:', error);
+                }
+                initReminderSettings();
+            }
+            
+            // 获取DOM元素
+            const pendingExerciseList = document.getElementById('pending-exercise-list');
+            const completedExerciseList = document.getElementById('completed-exercise-list');
+            const pendingListContainer = document.getElementById('pending-list-container');
+            const completedListContainer = document.getElementById('completed-list-container');
+            const pendingTab = document.getElementById('pending-tab');
+            const completedTab = document.getElementById('completed-tab');
+            const addExerciseBtn = document.getElementById('add-exercise');
+            const clearCompletedBtn = document.getElementById('clear-completed');
+            const clearAllBtn = document.getElementById('clear-all');
+            const exerciseName = document.getElementById('exercise-name');
+            const exerciseType = document.getElementById('exercise-type');
+            const exerciseDuration = document.getElementById('exercise-duration');
+            const exerciseIntensity = document.getElementById('exercise-intensity');
+            const typeList = document.getElementById('type-list');
+            const addTypeBtn = document.getElementById('add-type');
+            const newTypeInput = document.getElementById('new-type');
+            const filterType = document.getElementById('filter-type');
+            const sortBy = document.getElementById('sort-by');
+            const applyFiltersBtn = document.getElementById('apply-filters');
+            const exportDataBtn = document.getElementById('export-data');
+            const importDataBtn = document.getElementById('import-data');
+            const resetDataBtn = document.getElementById('reset-data');
+            
+            // 每日提醒元素
+            const reminderToggle = document.getElementById('reminder-toggle');
+            const reminderTime = document.getElementById('reminder-time');
+            const saveReminderBtn = document.getElementById('save-reminder');
+            const reminderStatus = document.getElementById('reminder-status');
+            
+            // 统计元素
+            const totalExercises = document.getElementById('total-exercises');
+            const completedExercises = document.getElementById('completed-exercises');
+            const pendingExercises = document.getElementById('pending-exercises');
+            const completionRate = document.getElementById('completion-rate');
+            
+            // 加载运动数据
+            async function loadExercises() {
+                try {
+                    const data = await exercisesAPI.getExercises();
+                    exercises = data;
+                } catch (error) {
+                    console.error('加载运动数据失败:', error);
+                    exercises = [];
+                }
+                renderExerciseList();
+            }
+
+            // 加载运动类型
+            async function loadExerciseTypes() {
+                try {
+                    const data = await exercisesAPI.getExerciseTypes();
+                    exerciseTypes = data;
+                } catch (error) {
+                    console.error('加载运动类型失败:', error);
+                    exerciseTypes = ['有氧运动', '力量训练', '柔韧性训练', '平衡训练'];
+                }
+                renderExerciseTypes();
+            }
+
+            // 更新统计信息
+            function updateStats() {
+                const total = exercises.length;
+                const completed = exercises.filter(ex => ex.completed).length;
+                const pending = total - completed;
+                const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+                
+                totalExercises.textContent = total;
+                completedExercises.textContent = completed;
+                pendingExercises.textContent = pending;
+                completionRate.textContent = `${rate}%`;
+            }
+            
+            // 渲染运动列表
+            function renderExerciseList() {
+                // 待完成运动列表
+                pendingExerciseList.innerHTML = '';
+                // 已完成运动列表
+                completedExerciseList.innerHTML = '';
+                
+                // 筛选和排序
+                let allExercises = [...exercises];
+                
+                // 应用排序
+                if (currentSort === 'name') {
+                    allExercises.sort((a, b) => a.name.localeCompare(b.name));
+                } else if (currentSort === 'duration') {
+                    allExercises.sort((a, b) => a.duration - b.duration);
+                } else {
+                    // 默认按创建时间排序
+                    allExercises.sort((a, b) => b.id - a.id);
+                }
+                
+                // 渲染到不同列表
+                allExercises.forEach(exercise => {
+                    const li = document.createElement('li');
+                    li.className = `exercise-item ${exercise.completed ? 'completed' : ''}`;
+                    li.dataset.id = exercise.id;
+                    
+                    li.innerHTML = `
+                        <div class="exercise-info">
+                            <input type="checkbox" id="exercise-checkbox-${exercise.id}" name="exercise-checkbox-${exercise.id}" class="exercise-checkbox" ${exercise.completed ? 'checked' : ''}>
+                            <div class="exercise-details">
+                                <div class="exercise-name">${exercise.name}</div>
+                                <div class="exercise-meta">
+                                    ${exercise.type} • ${exercise.duration} 分钟 • ${exercise.intensity}强度
+                                    ${exercise.completedAt ? `<br><small style="color: #48bb78;">完成时间：${exercise.completedAt}</small>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button style="background: #fc8181; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;" class="delete-exercise">删除</button>
+                        </div>
+                    `;
+                    
+                    // 添加事件监听器
+                    const checkbox = li.querySelector('.exercise-checkbox');
+                    checkbox.addEventListener('change', () => {
+                        toggleExerciseStatus(exercise.id);
+                    });
+                    
+                    const deleteBtn = li.querySelector('.delete-exercise');
+                    deleteBtn.addEventListener('click', () => {
+                        deleteExercise(exercise.id);
+                    });
+                    
+                    // 添加到对应列表
+                    if (exercise.completed) {
+                        completedExerciseList.appendChild(li);
+                    } else {
+                        pendingExerciseList.appendChild(li);
+                    }
+                });
+                
+                // 更新统计
+                updateStats();
+            }
+            
+            // 选项卡切换
+            pendingTab.addEventListener('click', () => {
+                pendingListContainer.style.display = 'block';
+                completedListContainer.style.display = 'none';
+                pendingTab.style.background = '#4299e1';
+                completedTab.style.background = '#48bb78';
+            });
+            
+            completedTab.addEventListener('click', () => {
+                pendingListContainer.style.display = 'none';
+                completedListContainer.style.display = 'block';
+                pendingTab.style.background = '#4299e1';
+                completedTab.style.background = '#38a169';
+            });
+            
+            // 请求通知权限
+            function requestNotificationPermission() {
+                if ('Notification' in window) {
+                    Notification.requestPermission();
+                }
+            }
+            
+            // 显示提醒通知
+            function showReminderNotification() {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('今日运动提醒', {
+                        body: '记得完成今天的运动计划哦！',
+                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2348bb78"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>'
+                    });
+                }
+            }
+            
+            // 设置每日提醒
+            function setDailyReminder() {
+                // 清除之前的定时器
+                if (window.reminderTimer) {
+                    clearInterval(window.reminderTimer);
+                }
+                
+                if (!reminderSettings.enabled) return;
+                
+                // 计算当前时间和提醒时间的差值
+                function calculateTimeUntilReminder() {
+                    const now = new Date();
+                    const [hours, minutes] = reminderSettings.time.split(':').map(Number);
+                    const reminderTime = new Date();
+                    reminderTime.setHours(hours, minutes, 0, 0);
+                    
+                    // 如果今天的提醒时间已过，设置为明天
+                    if (reminderTime < now) {
+                        reminderTime.setDate(reminderTime.getDate() + 1);
+                    }
+                    
+                    return reminderTime - now;
+                }
+                
+                // 设置定时器
+                function setupReminder() {
+                    const timeUntilReminder = calculateTimeUntilReminder();
+                    
+                    window.reminderTimer = setTimeout(() => {
+                        showReminderNotification();
+                        // 每天重复
+                        setupReminder();
+                    }, timeUntilReminder);
+                }
+                
+                setupReminder();
+            }
+            
+            // 保存提醒设置
+            async function saveReminderSettings() {
+                try {
+                    await exercisesAPI.saveReminderSettings(reminderSettings.enabled, reminderSettings.time);
+                } catch (error) {
+                    console.error('保存提醒设置失败:', error);
+                }
+                updateReminderStatus();
+                setDailyReminder();
+            }
+            
+            // 更新提醒状态显示
+            function updateReminderStatus() {
+                if (reminderSettings.enabled) {
+                    reminderStatus.textContent = `每日提醒已启用，时间：${reminderSettings.time}`;
+                } else {
+                    reminderStatus.textContent = '每日提醒已关闭';
+                }
+            }
+            
+            // 初始化提醒设置
+            function initReminderSettings() {
+                reminderToggle.checked = reminderSettings.enabled;
+                reminderTime.value = reminderSettings.time;
+                updateReminderStatus();
+                setDailyReminder();
+                requestNotificationPermission();
+            }
+            
+            // 渲染运动类型
+            function renderExerciseTypes() {
+                typeList.innerHTML = '';
+                
+                exerciseTypes.forEach(type => {
+                    const tag = document.createElement('div');
+                    tag.className = 'type-tag';
+                    tag.textContent = type;
+                    tag.addEventListener('click', () => {
+                        // 这里可以添加按类型筛选的功能
+                        tag.classList.toggle('active');
+                    });
+                    typeList.appendChild(tag);
+                });
+                
+                // 更新类型选择下拉框
+                updateTypeSelect();
+            }
+            
+            // 更新类型选择下拉框
+            function updateTypeSelect() {
+                exerciseType.innerHTML = '';
+                exerciseTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    exerciseType.appendChild(option);
+                });
+            }
+            
+            // 添加运动
+            async function addExercise() {
+                const name = exerciseName.value.trim();
+                const type = exerciseType.value;
+                const duration = parseInt(exerciseDuration.value) || 0;
+                const intensity = exerciseIntensity.value;
+                
+                if (!name) {
+                    alert('请输入运动名称！');
+                    return;
+                }
+                
+                try {
+                    const newExercise = await exercisesAPI.createExercise(name, type, duration, intensity);
+                    exercises.push(newExercise);
+                    alert('运动添加成功！');
+                } catch (error) {
+                    console.error('添加运动失败:', error);
+                    alert('添加运动失败，请稍后重试！');
+                }
+                
+                // 清空表单
+                exerciseName.value = '';
+                exerciseDuration.value = '';
+                
+                renderExerciseList();
+            }
+            
+            // 切换运动状态
+            async function toggleExerciseStatus(id) {
+                const exerciseIndex = exercises.findIndex(ex => ex.id === id);
+                if (exerciseIndex !== -1) {
+                    const exercise = exercises[exerciseIndex];
+                    const newCompletedStatus = !exercise.completed;
+                    
+                    try {
+                        await exercisesAPI.updateExerciseStatus(id, newCompletedStatus);
+                        exercise.completed = newCompletedStatus;
+                        
+                        // 记录完成时间
+                        if (newCompletedStatus) {
+                            exercise.completedAt = new Date().toLocaleString();
+                        } else {
+                            delete exercise.completedAt;
+                        }
+                        
+                    } catch (error) {
+                        console.error('更新运动状态失败:', error);
+                        console.log('更新运动状态失败，请重试');
+                    }
+                    
+                    renderExerciseList();
+                }
+            }
+            
+            // 删除运动
+            async function deleteExercise(id) {
+                const exerciseIndex = exercises.findIndex(ex => ex.id === id);
+                if (exerciseIndex !== -1) {
+                    if (confirm('确定要删除这个运动吗？')) {
+                        try {
+                            await exercisesAPI.deleteExercise(id);
+                            exercises.splice(exerciseIndex, 1);
+                            alert('运动删除成功！');
+                        } catch (error) {
+                            console.error('删除运动失败:', error);
+                            alert('删除运动失败，请重试');
+                        }
+                        
+                        renderExerciseList();
+                    }
+                }
+            }
+            
+            // 清除已完成运动
+            async function clearCompleted() {
+                const completedExercises = exercises.filter(ex => ex.completed);
+                
+                try {
+                    // 批量删除已完成运动
+                    for (const exercise of completedExercises) {
+                        await exercisesAPI.deleteExercise(exercise.id);
+                    }
+                    exercises = exercises.filter(ex => !ex.completed);
+                    alert('已完成运动清除成功！');
+                } catch (error) {
+                    console.error('清除已完成运动失败:', error);
+                    alert('清除已完成运动失败，请稍后重试！');
+                }
+                renderExerciseList();
+            }
+            
+            // 清除所有运动
+            async function clearAll() {
+                if (confirm('确定要清除所有运动吗？')) {
+                    try {
+                        // 批量删除所有运动
+                        for (const exercise of [...exercises]) {
+                            await exercisesAPI.deleteExercise(exercise.id);
+                        }
+                        exercises = [];
+                        alert('所有运动清除成功！');
+                    } catch (error) {
+                        console.error('清除所有运动失败:', error);
+                        alert('清除所有运动失败，请稍后重试！');
+                    }
+                    renderExerciseList();
+                }
+            }
+            
+            // 添加运动类型
+            async function addExerciseType() {
+                const newType = newTypeInput.value.trim();
+                if (newType) {
+                    // 检查前端是否已有该类型
+                    if (exerciseTypes.includes(newType)) {
+                        alert('该运动类型已存在');
+                        return;
+                    }
+                    
+                    try {
+                        await exercisesAPI.createExerciseType(newType);
+                        exerciseTypes.push(newType);
+                        alert('运动类型添加成功！');
+                    } catch (error) {
+                        console.error('添加运动类型失败:', error);
+                        
+                        // 处理特定的错误类型
+                        if (error.message && error.message.includes('该运动类型已存在')) {
+                            alert('该运动类型已存在，请选择其他类型');
+                        } else {
+                            alert('添加运动类型失败，请重试');
+                        }
+                    }
+                    newTypeInput.value = '';
+                    renderExerciseTypes();
+                }
+            }
+            
+            // 应用筛选和排序
+            function applyFilters() {
+                currentFilter = filterType.value;
+                currentSort = sortBy.value;
+                renderExerciseList();
+            }
+            
+            // 导出数据
+            function exportData() {
+                const data = {
+                    exercises,
+                    exerciseTypes,
+                    exportDate: new Date().toISOString()
+                };
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `exercises-${new Date().toISOString().slice(0, 10)}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            // 导入数据
+            async function importData() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = async function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = async function(event) {
+                            try {
+                                const importedData = JSON.parse(event.target.result);
+                                
+                                // 调用API导入数据
+                                await exercisesAPI.importData(importedData);
+                                
+                                // 重新加载数据
+                                await loadExercises();
+                                await loadExerciseTypes();
+                                
+                                alert('数据导入成功！');
+                            } catch (error) {
+                                console.error('导入失败：' + error.message);
+                                alert('导入失败：' + error.message);
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                input.click();
+            }
+            
+            // 重置数据
+            async function resetData() {
+                if (confirm('确定要重置所有数据吗？此操作不可恢复！')) {
+                    try {
+                        // 调用API重置数据
+                        await exercisesAPI.resetData();
+                        exercises = [];
+                        exerciseTypes = ['有氧运动', '力量训练', '柔韧性训练', '平衡训练'];
+                        renderExerciseList();
+                        renderExerciseTypes();
+                        alert('数据已重置！');
+                    } catch (error) {
+                        console.error('重置数据失败:', error);
+                        alert('重置数据失败，请稍后重试！');
+                    }
+                }
+            }
+            
+            // 添加事件监听器
+            addExerciseBtn.addEventListener('click', addExercise);
+            clearCompletedBtn.addEventListener('click', clearCompleted);
+            clearAllBtn.addEventListener('click', clearAll);
+            addTypeBtn.addEventListener('click', addExerciseType);
+            applyFiltersBtn.addEventListener('click', applyFilters);
+            exportDataBtn.addEventListener('click', exportData);
+            importDataBtn.addEventListener('click', importData);
+            resetDataBtn.addEventListener('click', resetData);
+            
+            // 每日提醒事件监听器
+            reminderToggle.addEventListener('change', async () => {
+                reminderSettings.enabled = reminderToggle.checked;
+                await saveReminderSettings();
+            });
+            
+            saveReminderBtn.addEventListener('click', async () => {
+                reminderSettings.time = reminderTime.value;
+                await saveReminderSettings();
+            });
+            
+            // 回车键添加运动
+            document.querySelectorAll('#exercise-name, #exercise-duration').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        addExercise();
+                    }
+                });
+            });
+            
+            // 回车键添加类型
+            newTypeInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addExerciseType();
+                }
+            });
+            
+            // 初始化
+            await loadExercises();
+            await loadExerciseTypes();
+            await loadReminderSettings();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
