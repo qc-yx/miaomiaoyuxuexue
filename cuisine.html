@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍜 今日菜系</title>
+    <!-- 添加PWA优化的meta标签 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多功能应用">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('images/picture/4/d2b05d164ae5364e7dca4d6a7815bc2f.jpg') center/cover no-repeat;
+    min-height: 100vh;
+    color: #333;
+}
+
+        /* 页面容器 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 导航按钮 */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: start;
+        }
+
+        /* 功能卡片样式 */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* 功能卡片标题 */
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        /* 今日菜系显示区域 */
+        .cuisine-display {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #f6ad55, #ed8936);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(246, 173, 85, 0.4);
+        }
+
+        /* 按钮样式 */
+        .cuisine-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .cuisine-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        /* 自定义设置区域 */
+        .customization-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        /* 菜系分类 */
+        .cuisine-categories {
+            margin-bottom: 20px;
+        }
+
+        .category-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .category-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        /* 菜单项 */
+        .dish-list {
+            margin-bottom: 15px;
+        }
+
+        .dish-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .dish-item input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .dish-item input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .remove-dish {
+            background: #fc8181;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .remove-dish:hover {
+            background: #f56565;
+        }
+
+        /* 添加按钮 */
+        .add-btn {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
+        }
+
+        /* 保存按钮 */
+        .save-btn {
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(159, 122, 234, 0.4);
+        }
+
+        /* 历史记录 */
+        .history-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .history-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .cuisine-display {
+                font-size: 1.5rem;
+                min-height: 150px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* 小屏移动设备适配 */
+        @media (max-width: 480px) {
+            /* 优化容器内边距 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            /* 调整导航按钮布局 */
+            .nav-buttons {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 14px;
+                border-radius: 20px;
+            }
+
+            /* 调整菜系显示区域 */
+            .cuisine-display {
+                font-size: 1.2rem;
+                min-height: 120px;
+                padding: 25px 15px;
+            }
+
+            /* 调整按钮大小 */
+            .cuisine-btn, #save-cuisines, .add-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                margin: 8px 5px;
+                border-radius: 25px;
+            }
+
+            /* 调整功能卡片内边距 */
+            .feature-card {
+                padding: 20px;
+            }
+
+            /* 调整卡片标题大小 */
+            .feature-title {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+
+            /* 调整菜系分类和菜品项 */
+            .category-item {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .category-title {
+                margin-bottom: 8px;
+            }
+
+            .dish-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+
+            .dish-item input, .category-title input {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .remove-dish {
+                align-self: center;
+                width: 36px;
+                height: 36px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+            }
+
+            /* 调整添加菜品按钮 */
+            .add-btn {
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+
+            /* 调整历史记录 */
+            .history-section {
+                margin-top: 15px;
+                padding-top: 15px;
+            }
+
+            .history-item {
+                font-size: 13px;
+                padding: 6px;
+            }
+        }
+
+        /* 横屏设备适配 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            /* 调整容器内边距 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            /* 调整导航按钮 */
+            .nav-buttons {
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .nav-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* 调整功能卡片 */
+            .feature-card {
+                padding: 15px;
+            }
+
+            .feature-title {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            /* 调整菜系显示区域 */
+            .cuisine-display {
+                font-size: 1.2rem;
+                min-height: 100px;
+                padding: 20px 15px;
+            }
+
+            /* 调整按钮大小 */
+            .cuisine-btn, #save-cuisines, .add-btn {
+                padding: 10px 16px;
+                font-size: 12px;
+                margin: 5px;
+            }
+
+            /* 调整历史记录 */
+            .history-section {
+                margin-top: 12px;
+                padding-top: 12px;
+            }
+
+            .history-list {
+                max-height: 100px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            /* 移除悬停效果 */
+            .nav-btn:hover, .cuisine-btn:hover, .save-btn:hover, .add-btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .remove-dish:hover {
+                background: #fc8181;
+            }
+
+            /* 增大触摸目标 */
+            .nav-btn, .cuisine-btn, #save-cuisines, .add-btn, .remove-dish {
+                min-width: 44px;
+                min-height: 44px;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">🍜 今日菜系</h1>
+        
+        <!-- 导航按钮 -->
+        <div class="nav-buttons">
+            <a href="main.html" class="nav-btn">返回首页</a>
+            <a href="wheel.html" class="nav-btn">转盘游戏</a>
+            <a href="notes.html" class="nav-btn">记事本</a>
+            <a href="exercise.html" class="nav-btn">今日运动</a>
+        </div>
+        
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 菜系显示区域 -->
+            <div class="feature-card">
+                <h2 class="feature-title">今日推荐</h2>
+                <div class="cuisine-display" id="cuisine-display">
+                    点击按钮获取今日推荐
+                </div>
+                <div style="text-align: center;">
+                    <button class="cuisine-btn" id="random-dish">随机推荐菜品</button>
+                    <button class="cuisine-btn" id="clear-history">清除历史</button>
+                </div>
+                
+                <!-- 历史记录 -->
+                <div class="history-section">
+                    <h3 class="section-title">推荐历史</h3>
+                    <div class="history-list" id="history-list"></div>
+                </div>
+            </div>
+            
+            <!-- 自定义设置区域 -->
+            <div class="feature-card">
+                <h2 class="feature-title">自定义菜系</h2>
+                
+                <div class="customization-section">
+                    <h3 class="section-title">菜系管理</h3>
+                    <div class="cuisine-categories" id="cuisine-categories">
+                        <!-- 菜系分类将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="add-category" class="add-btn">+ 添加菜系分类</button>
+                </div>
+                
+                <button id="save-cuisines" class="save-btn">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script-github-pages.js"></script>
+    <script>
+        // DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 确保cuisineAPI对象有getHistory方法
+            if (typeof cuisineAPI.getHistory !== 'function') {
+                console.log('cuisineAPI.getHistory 方法不存在，正在添加...');
+                cuisineAPI.getHistory = async function() {
+                    return await apiRequest('/cuisine/history');
+                };
+            }
+            
+            // 初始化变量
+        let cuisines = {
+                '粤菜': ['白切鸡', '烧腊', '虾饺', '肠粉', '烧麦'],
+                '鲁菜': ['糖醋里脊', '九转大肠', '葱烧海参', '油焖大虾', '德州扒鸡'],
+                '苏菜': ['松鼠桂鱼', '狮子头', '叫花鸡', '清炖蟹粉狮子头', '盐水鸭'],
+                '浙菜': ['西湖醋鱼', '龙井虾仁', '东坡肉', '宋嫂鱼羹', '干炸响铃'],
+                '闽菜': ['佛跳墙', '荔枝肉', '沙茶面', '海蛎煎', '南煎肝'],
+                '湘菜': ['剁椒鱼头', '辣椒炒肉', '毛氏红烧肉', '湘西土匪鸭', '永州血鸭'],
+                '徽菜': ['臭鳜鱼', '胡适一品锅', '徽州毛豆腐', '黄山炖鸽', '问政山笋']
+            };
+            
+            let history = [];
+            
+            const cuisineDisplay = document.getElementById('cuisine-display');
+            const randomDishBtn = document.getElementById('random-dish');
+            const clearHistoryBtn = document.getElementById('clear-history');
+            const cuisineCategories = document.getElementById('cuisine-categories');
+            const addCategoryBtn = document.getElementById('add-category');
+            const saveCuisinesBtn = document.getElementById('save-cuisines');
+            const historyList = document.getElementById('history-list');
+            
+            // 从API加载数据
+            async function loadData() {
+                try {
+                    // 加载菜系分类
+                    const categoriesData = await cuisineAPI.getCategories();
+                    if (categoriesData && Object.keys(categoriesData).length > 0) {
+                        cuisines = categoriesData;
+                    }
+                    
+                    // 加载历史记录
+                    const historyData = await cuisineAPI.getHistory();
+                    if (historyData && historyData.length > 0) {
+                        history = historyData;
+                    }
+                } catch (error) {
+                    console.error('加载数据失败:', error);
+                }
+                
+                generateCuisineCategories();
+                displayHistory();
+            }
+            
+            // 显示历史记录
+            function displayHistory() {
+                historyList.innerHTML = '';
+                history.slice(-10).forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.textContent = `${item.time}: ${item.content}`;
+                    historyList.appendChild(historyItem);
+                });
+            }
+            
+            // 添加到历史记录
+            async function addToHistory(content) {
+                const now = new Date();
+                const time = now.toLocaleTimeString();
+                const historyItem = { time, content };
+                history.push(historyItem);
+                
+                try {
+                    await cuisineAPI.saveHistory([historyItem]);
+                } catch (error) {
+                    console.error('保存历史记录失败:', error);
+                }
+                displayHistory();
+            }
+            
+            // 随机推荐菜品
+            randomDishBtn.addEventListener('click', async function() {
+                try {
+                    // 调用API获取随机菜品
+                    const result = await cuisineAPI.getRandomDish();
+                    const randomDish = result.dish;
+                    
+                    cuisineDisplay.textContent = `今日推荐：${randomDish}`;
+                    await addToHistory(`今日推荐：${randomDish}`);
+                } catch (error) {
+                    console.error('获取随机菜品失败:', error);
+                    cuisineDisplay.textContent = '获取随机菜品失败，请稍后重试！';
+                }
+            });
+            
+            // 清除历史记录
+            clearHistoryBtn.addEventListener('click', async function() {
+                history = [];
+                
+                try {
+                    await cuisineAPI.clearHistory();
+                } catch (error) {
+                    console.error('清除历史记录失败:', error);
+                }
+                
+                displayHistory();
+            });
+            
+            // 生成菜系分类
+            function generateCuisineCategories() {
+                cuisineCategories.innerHTML = '';
+                
+                Object.entries(cuisines).forEach(([category, dishes]) => {
+                    const categoryItem = document.createElement('div');
+                    categoryItem.className = 'category-item';
+                    
+                    // 菜系标题
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'category-title';
+                    categoryHeader.innerHTML = `
+                        <label for="category-${category.toLowerCase().replace(/\s+/g, '-')}" style="display: block; margin-bottom: 5px; font-weight: 600;">分类名称:</label>
+                        <input type="text" id="category-${category.toLowerCase().replace(/\s+/g, '-')}" name="category-${category.toLowerCase().replace(/\s+/g, '-')}" value="${category}" style="width: 100%; padding: 8px; border: 2px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px;" onchange="updateCategoryName('${category}', this.value)">
+                        <button onclick="removeCategory('${category}')" style="background: #fc8181; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer;">删除分类</button>
+                    `;
+                    
+                    // 菜品列表
+                    const dishList = document.createElement('div');
+                    dishList.className = 'dish-list';
+                    
+                    dishes.forEach((dish, index) => {
+                        const dishItem = document.createElement('div');
+                        dishItem.className = 'dish-item';
+                        dishItem.innerHTML = `
+                            <label for="dish-${category.toLowerCase().replace(/\s+/g, '-')}-${index}" style="display: block; margin-bottom: 5px; font-weight: 600;">菜品 ${index + 1}:</label>
+                            <input type="text" id="dish-${category.toLowerCase().replace(/\s+/g, '-')}-${index}" name="dish-${category.toLowerCase().replace(/\s+/g, '-')}-${index}" value="${dish}" onchange="updateDish('${category}', ${index}, this.value)">
+                            <button onclick="removeDish('${category}', ${index})" class="remove-dish">×</button>
+                        `;
+                        dishList.appendChild(dishItem);
+                    });
+                    
+                    // 添加菜品按钮
+                    const addDishBtn = document.createElement('button');
+                    addDishBtn.className = 'add-btn';
+                    addDishBtn.textContent = `+ 添加${category}菜品`;
+                    addDishBtn.style.fontSize = '12px';
+                    addDishBtn.style.padding = '6px 12px';
+                    addDishBtn.onclick = function() {
+                        addDish(category);
+                    };
+                    
+                    categoryItem.appendChild(categoryHeader);
+                    categoryItem.appendChild(dishList);
+                    categoryItem.appendChild(addDishBtn);
+                    cuisineCategories.appendChild(categoryItem);
+                });
+            }
+            
+            // 更新菜系名称
+            window.updateCategoryName = function(oldName, newName) {
+                if (newName && newName !== oldName) {
+                    cuisines[newName] = cuisines[oldName];
+                    delete cuisines[oldName];
+                    generateCuisineCategories();
+                }
+            };
+            
+            // 删除菜系分类
+            window.removeCategory = function(category) {
+                if (Object.keys(cuisines).length > 1) {
+                    delete cuisines[category];
+                    generateCuisineCategories();
+                } else {
+                    console.log('至少需要保留一个菜系分类！');
+                }
+            };
+            
+            // 更新菜品
+            window.updateDish = function(category, index, newDish) {
+                cuisines[category][index] = newDish;
+            };
+            
+            // 删除菜品
+            window.removeDish = function(category, index) {
+                if (cuisines[category].length > 1) {
+                    cuisines[category].splice(index, 1);
+                    generateCuisineCategories();
+                } else {
+                    console.log('每个菜系至少需要保留一道菜品！');
+                }
+            };
+            
+            // 添加菜品
+            function addDish(category) {
+                cuisines[category].push('新菜品');
+                generateCuisineCategories();
+            }
+            
+            // 添加菜系分类
+            addCategoryBtn.addEventListener('click', function() {
+                const newCategory = `新菜系${Object.keys(cuisines).length + 1}`;
+                cuisines[newCategory] = ['新菜品1', '新菜品2'];
+                generateCuisineCategories();
+            });
+            
+            // 保存设置
+            saveCuisinesBtn.addEventListener('click', async function() {
+                try {
+                    await cuisineAPI.saveCategories(cuisines);
+                    alert('设置已保存！');
+                } catch (error) {
+                    console.error('保存设置失败:', error);
+                    alert('保存设置失败，请稍后重试！');
+                }
+            });
+            
+            // 初始化
+            await loadData();
+        });
+    </script>
+</body>
+</html>
