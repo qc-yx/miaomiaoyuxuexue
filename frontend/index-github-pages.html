@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多功能应用 - GitHub Pages版</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 添加iOS优化的meta标签 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多功能应用">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 多功能应用</h1>
+            <p class="subtitle">GitHub Pages 纯前端版本</p>
+            <div class="auth-status" id="authStatus">
+                <span id="currentUser">游客</span>
+                <button id="logoutBtn" style="display: none;">退出</button>
+            </div>
+        </header>
+
+        <!-- 登录/注册区域 -->
+        <div id="authSection" class="auth-section">
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">登录</button>
+                <button class="tab-btn" data-tab="register">注册</button>
+            </div>
+            
+            <div id="loginTab" class="auth-form">
+                <h3>用户登录</h3>
+                <form id="loginForm">
+                    <label for="loginUsername" style="display: block; margin-bottom: 5px; font-weight: 600;">用户名:</label>
+                    <input type="text" id="loginUsername" placeholder="用户名" required>
+                    <label for="loginPassword" style="display: block; margin-bottom: 5px; font-weight: 600;">密码:</label>
+                    <input type="password" id="loginPassword" placeholder="密码" required>
+                    <button type="submit">登录</button>
+                </form>
+            </div>
+            
+            <div id="registerTab" class="auth-form" style="display: none;">
+                <h3>用户注册</h3>
+                <form id="registerForm">
+                    <label for="registerUsername" style="display: block; margin-bottom: 5px; font-weight: 600;">用户名:</label>
+                    <input type="text" id="registerUsername" placeholder="用户名" required>
+                    <label for="registerPassword" style="display: block; margin-bottom: 5px; font-weight: 600;">密码:</label>
+                    <input type="password" id="registerPassword" placeholder="密码" required>
