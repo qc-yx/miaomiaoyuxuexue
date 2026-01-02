@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册测试</title>
+</head>
+<body>
+    <h1>注册功能测试</h1>
+    
+    <form id="test-register-form">
+        <div>
+            <label for="test-username">用户名:</label>
+            <input type="text" id="test-username" value="test_user_simple">
+        </div>
+        <div>
+            <label for="test-password">密码:</label>
+            <input type="password" id="test-password" value="password123">
+        </div>
+        <div>
+            <label for="test-name">姓名:</label>
+            <input type="text" id="test-name" value="测试用户">
+        </div>
+        <button type="submit">测试注册</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('test-register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('test-username').value;
+            const password = document.getElementById('test-password').value;
+            const name = document.getElementById('test-name').value;
+            
+            console.log('表单数据:', { username, password, name });
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, name })
+                });
+                
+                const data = await response.json();
+                console.log('API响应:', data);
