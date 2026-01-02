@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎡 转盘小游戏</title>
+    <!-- 添加PWA优化的meta标签 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多功能应用">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('./images/picture/3/81f281b8fa1394817441bb9e2f05c674.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 页面容器 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 导航按钮 */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: start;
+        }
+
+        /* 功能卡片样式 */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 功能卡片标题 */
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        /* 转盘游戏样式 */
+        .wheel-container {
+            text-align: center;
+            position: relative;
+        }
+
+        #wheel {
+        width: 300px;
+        height: 300px;
+        margin: 0 auto 20px;
+        cursor: pointer;
+    }
+
+        #wheel-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        #wheel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        /* 自定义设置区域 */
+        .customization-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
+        /* 选项列表 */
+        .option-list {
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .option-item input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .option-item input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+
+        .remove-option {
+            background: rgba(252, 129, 129, 0.2);
+            color: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(252, 129, 129, 0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .remove-option:hover {
+            background: rgba(245, 101, 101, 0.3);
+        }
+
+        /* 添加选项按钮 */
+        #add-option {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        #add-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
+        }
+
+        /* 保存设置按钮 */
+        #save-settings {
+            background: linear-gradient(135deg, #9f7aea, #805ad5);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #save-settings:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(159, 122, 234, 0.4);
+        }
+
+        /* 结果显示 */
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            #wheel {
+                width: 250px;
+                height: 250px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* 小屏移动设备适配 */
+        @media (max-width: 480px) {
+            /* 优化容器内边距 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 调整标题大小 */
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            /* 调整导航按钮布局 */
+            .nav-buttons {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 14px;
+                border-radius: 20px;
+            }
+
+            /* 调整转盘大小 */
+            #wheel {
+                width: 220px;
+                height: 220px;
+            }
+
+            /* 调整按钮大小 */
+            #wheel-btn, #reset-wheel {
+                padding: 12px 24px;
+                font-size: 16px;
+                margin: 5px;
+            }
+
+            /* 调整功能卡片内边距 */
+            .feature-card {
+                padding: 20px;
+            }
+
+            /* 调整卡片标题大小 */
+            .feature-title {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+
+            /* 调整选项列表样式 */
+            .option-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .option-item input {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            .remove-option {
+                align-self: center;
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+            }
+
+            /* 调整主题选择器样式 */
+            .customization-section select {
+                width: 100%;
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            /* 调整添加选项和保存按钮 */
+            #add-option, #save-settings {
+                padding: 14px 20px;
+                font-size: 16px;
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            /* 调整结果显示 */
+            #result {
+                font-size: 16px;
+                padding: 12px;
+                margin-top: 15px;
+            }
+
+            /* 优化背景图片显示 */
+            body {
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+            }
+        }
+
+        /* 横屏设备适配 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            /* 调整页面布局为横向 */
+            .container {
+                padding: 10px;
+            }
+
+            /* 减小标题大小 */
+            .page-title {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+
+            /* 导航按钮横向排列 */
+            .nav-buttons {
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .nav-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* 调整转盘大小 */
+            #wheel {
+                width: 180px;
+                height: 180px;
+            }
+
+            /* 调整按钮大小 */
+            #wheel-btn, #reset-wheel {
+                padding: 10px 20px;
+                font-size: 14px;
+                margin: 5px;
+            }
+
+            /* 调整功能卡片内边距 */
+            .feature-card {
+                padding: 15px;
+            }
+
+            /* 调整卡片标题大小 */
+            .feature-title {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            /* 移除悬停效果 */
+            .nav-btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            #wheel-btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .remove-option:hover {
+                background: rgba(252, 129, 129, 0.2);
+            }
+
+            #add-option:hover, #save-settings:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            /* 增大触摸目标 */
+            .nav-btn, #wheel-btn, #reset-wheel, #add-option, #save-settings, .remove-option {
+                min-width: 44px;
+                min-height: 44px;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">🎡 转盘小游戏</h1>
+        
+        <!-- 导航按钮 -->
+        <div class="nav-buttons">
+            <a href="main.html" class="nav-btn">返回首页</a>
+            <a href="cuisine.html" class="nav-btn">今日菜系</a>
+            <a href="notes.html" class="nav-btn">记事本</a>
+            <a href="exercise.html" class="nav-btn">今日运动</a>
+        </div>
+        
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 转盘游戏区域 -->
+            <div class="feature-card">
+                <h2 class="feature-title">游戏区域</h2>
+                <div class="wheel-container">
+                    <svg id="wheel" viewBox="0 0 200 200">
+                        <!-- 转盘扇区将通过JavaScript动态生成 -->
+                    </svg>
+                    <div>
+                        <button id="wheel-btn">开始转动</button>
+                        <button id="reset-wheel">重置转盘</button>
+                    </div>
+                    <div id="result"></div>
+                </div>
+            </div>
+            
+            <!-- 自定义设置区域 -->
+            <div class="feature-card">
+                <h2 class="feature-title">自定义设置</h2>
+                
+                <div class="customization-section">
+                    <h3 class="section-title">方案管理</h3>
+                    <div class="option-item" style="display: block; margin-bottom: 15px;">
+                        <label for="scheme-name" style="display: block; margin-bottom: 5px; color: rgba(255, 255, 255, 0.9); font-weight: 600;">方案名称:</label>
+                        <input type="text" id="scheme-name" name="scheme-name" placeholder="输入方案名称" style="padding: 10px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.3); width: 100%; background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.95);">
+                    </div>
+                    <div class="option-item" style="display: block; margin-top: 15px; margin-bottom: 15px;">
+                        <label for="scheme-select" style="display: block; margin-bottom: 5px; color: rgba(255, 255, 255, 0.9); font-weight: 600;">选择方案:</label>
+                        <select id="scheme-select" name="scheme-select" style="padding: 10px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.3); width: 100%; background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.95); margin-bottom: 10px;">
+                            <!-- 方案列表将通过JavaScript动态生成 -->
+                        </select>
+                        <button id="delete-scheme" style="background: linear-gradient(135deg, #fc8181, #f56565); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer;">删除方案</button>
+                    </div>
+                </div>
+                
+                <div class="customization-section">
+                    <h3 class="section-title">转盘选项</h3>
+                    <div class="option-list" id="option-list">
+                        <!-- 选项将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="add-option">+ 添加选项</button>
+                </div>
+                
+                <div class="customization-section">
+                    <h3 class="section-title">主题设置</h3>
+                    <div class="option-item">
+                        <label for="theme-color">主题颜色:</label>
+                        <select id="theme-color" name="theme-color" style="padding: 10px; border-radius: 8px; border: 2px solid #e2e8f0;">
+                            <option value="green">绿色主题</option>
+                            <option value="blue">蓝色主题</option>
+                            <option value="purple">紫色主题</option>
+                            <option value="orange">橙色主题</option>
+                            <option value="red">红色主题</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="save-settings">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script-github-pages.js"></script>
+    
+    <script>
+        // DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化变量
+        let wheelOptions = ['一等奖', '二等奖', '三等奖', '参与奖', '谢谢参与', '再来一次'];
+        let theme = 'green';
+        let currentRotation = 0; // 跟踪当前累计旋转角度
+        let dataUserId = null; // 用于共享数据的目标用户ID
+        let currentSchemeId = null; // 当前选中的方案ID
+        let allSchemes = []; // 存储所有方案
+            
+            // 获取DOM元素
+            const wheel = document.getElementById('wheel');
+            const wheelBtn = document.getElementById('wheel-btn');
+            const resetBtn = document.getElementById('reset-wheel');
+            const resultDiv = document.getElementById('result');
+            const optionList = document.getElementById('option-list');
+            const addOptionBtn = document.getElementById('add-option');
+            const saveSettingsBtn = document.getElementById('save-settings');
+            const themeColor = document.getElementById('theme-color');
+            const schemeNameInput = document.getElementById('scheme-name');
+            const schemeSelect = document.getElementById('scheme-select');
+            const deleteSchemeBtn = document.getElementById('delete-scheme');
+            
+            // 获取当前用户的存储ID（支持绑定用户数据共享）
+            function getCurrentUserId() {
+                const token = localStorage.getItem('token');
+                if (!token) return 'guest';
+                
+                try {
+                    // 简单的token解析（实际应该使用JWT库）
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    return payload.id || 'unknown';
+                } catch (e) {
+                    return 'guest';
+                }
+            }
+            
+            // 获取当前用户应该使用的存储ID（考虑数据共享）
+            function getStorageUserId() {
+                const sharedUserId = localStorage.getItem('sharedUserId');
+                return sharedUserId || getCurrentUserId();
+            }
+
+            // 从API加载所有转盘方案
+            async function loadWheelSettings() {
+                try {
+                    const response = await wheelAPI.getAllWheelSettings();
+                    allSchemes = response.settings || [];
+                    dataUserId = response.dataUserId;
+                    
+                    console.log('加载的方案列表:', allSchemes);
+                    
+                    // 更新方案列表
+                    updateSchemeList();
+                    
+                    // 如果有方案，默认选择第一个
+                    if (allSchemes.length > 0) {
+                        selectScheme(allSchemes[0].id);
+                    } else {
+                        // 使用默认值更新UI
+                        schemeNameInput.value = '默认方案';
+                        themeColor.value = theme;
+                        generateOptionList();
+                        generateWheel();
+                    }
+                } catch (error) {
+                    console.error('加载转盘方案失败:', error);
+                    // 使用默认值更新UI
+                    schemeNameInput.value = '默认方案';
+                    themeColor.value = theme;
+                    generateOptionList();
+                    generateWheel();
+                }
+            }
+            
+            // 更新方案列表下拉菜单
+            function updateSchemeList() {
+                schemeSelect.innerHTML = '';
+                
+                // 添加一个"新建方案"选项
+                const newOption = document.createElement('option');
+                newOption.value = '';
+                newOption.textContent = '新建方案';
+                schemeSelect.appendChild(newOption);
+                
+                console.log('更新方案列表，方案数量:', allSchemes.length);
+                
+                // 添加现有方案
+                allSchemes.forEach(scheme => {
+                    console.log('添加方案:', scheme.name, scheme.id);
+                    const option = document.createElement('option');
+                    option.value = scheme.id;
+                    option.textContent = scheme.name;
+                    schemeSelect.appendChild(option);
+                    
+                    // 如果是当前选中的方案，设置为选中状态
+                    if (scheme.id === currentSchemeId) {
+                        option.selected = true;
+                    }
+                });
+            }
+            
+            // 选择方案
+            async function selectScheme(schemeId) {
+                if (!schemeId) {
+                    // 新建方案，重置为默认值
+                    currentSchemeId = null;
+                    schemeNameInput.value = '默认方案';
+                    wheelOptions = ['一等奖', '二等奖', '三等奖', '参与奖', '谢谢参与', '再来一次'];
+                    theme = 'green';
+                    themeColor.value = theme;
+                    generateOptionList();
+                    generateWheel();
+                    return;
+                }
+                
+                try {
+                    const response = await wheelAPI.getWheelSettings(schemeId);
+                    currentSchemeId = schemeId;
+                    
+                    // 更新方案名称
+                    const scheme = allSchemes.find(s => s.id === schemeId);
+                    if (scheme) {
+                        schemeNameInput.value = scheme.name;
+                    }
+                    
+                    // 确保wheelOptions始终是数组
+                    let newOptions = response.options || wheelOptions;
+                    if (typeof newOptions === 'string') {
+                        // 如果是字符串，尝试JSON解析
+                        try {
+                            newOptions = JSON.parse(newOptions);
+                        } catch (e) {
+                            // 如果解析失败，使用默认值
+                            newOptions = wheelOptions;
+                        }
+                    }
+                    // 确保最终结果是数组
+                    wheelOptions = Array.isArray(newOptions) ? newOptions : wheelOptions;
+                    
+                    theme = response.theme || theme;
+                    
+                    // 更新UI
+                    themeColor.value = theme;
+                    generateOptionList();
+                    generateWheel();
+                } catch (error) {
+                    console.error('加载方案失败:', error);
+                    alert('加载方案失败，请稍后重试！');
+                }
+            }
+            
+            // 删除方案
+            async function deleteScheme(schemeId) {
+                if (!schemeId) return;
+                
+                if (confirm('确定要删除这个方案吗？')) {
+                    try {
+                        await wheelAPI.deleteWheelSettings(schemeId);
+                        // 重新加载方案列表
+                        await loadWheelSettings();
+                        alert('方案删除成功！');
+                    } catch (error) {
+                        console.error('删除方案失败:', error);
+                        alert('删除方案失败，请稍后重试！');
+                    }
+                }
+            }
+            
+            // 颜色主题配置
+            const themes = {
+                green: ['#48bb78', '#38a169', '#319795', '#2c7a7b', '#285e61', '#234e52'],
+                blue: ['#4299e1', '#3182ce', '#2b6cb0', '#2c5282', '#2a4365', '#1a365d'],
+                purple: ['#9f7aea', '#805ad5', '#6b46c1', '#553c9a', '#44337a', '#3c366b'],
+                orange: ['#ed8936', '#dd6b20', '#c05621', '#9c4221', '#7b341e', '#652b19'],
+                red: ['#fc8181', '#f56565', '#e53e3e', '#c53030', '#9b2c2c', '#742a2a']
+            };
+            
+            // 生成转盘
+            function generateWheel() {
+                // 清空现有内容
+                wheel.innerHTML = '';
+                
+                const centerX = 100;
+                const centerY = 100;
+                const radius = 90;
+                const numOptions = wheelOptions.length;
+                const anglePerOption = (2 * Math.PI) / numOptions;
+                
+                // 生成扇区
+                wheelOptions.forEach((option, index) => {
+                    const startAngle = index * anglePerOption;
+                    const endAngle = (index + 1) * anglePerOption;
+                    
+                    // 计算扇形路径
+                    const startX = centerX + radius * Math.cos(startAngle);
+                    const startY = centerY + radius * Math.sin(startAngle);
+                    const endX = centerX + radius * Math.cos(endAngle);
+                    const endY = centerY + radius * Math.sin(endAngle);
+                    
+                    // 大弧标志
+                    const largeArcFlag = endAngle - startAngle <= Math.PI ? '0' : '1';
+                    
+                    // 生成路径
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', `M${centerX},${centerY} L${startX},${startY} A${radius},${radius} 0 ${largeArcFlag},1 ${endX},${endY} Z`);
+                    
+                    // 设置颜色
+                    const color = themes[theme][index % themes[theme].length];
+                    path.setAttribute('fill', color);
+                    
+                    // 添加文字
+                    const textAngle = startAngle + anglePerOption / 2;
+                    const textX = centerX + (radius * 0.7) * Math.cos(textAngle);
+                    const textY = centerY + (radius * 0.7) * Math.sin(textAngle);
+                    
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', textX);
+                    text.setAttribute('y', textY);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('dominant-baseline', 'middle');
+                    text.setAttribute('fill', 'white');
+                    text.setAttribute('font-size', '12');
+                    text.setAttribute('font-weight', '600');
+                    text.setAttribute('transform', `rotate(${textAngle * 180 / Math.PI}, ${textX}, ${textY})`);
+                    text.textContent = option;
+                    
+                    // 添加到SVG
+                    wheel.appendChild(path);
+                    wheel.appendChild(text);
+                });
+                
+                // 添加中心圆点
+                const centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                centerCircle.setAttribute('cx', centerX);
+                centerCircle.setAttribute('cy', centerY);
+                centerCircle.setAttribute('r', 15);
+                centerCircle.setAttribute('fill', 'white');
+                centerCircle.setAttribute('stroke', '#4a5568');
+                centerCircle.setAttribute('stroke-width', '2');
+                wheel.appendChild(centerCircle);
+            }
+            
+            // 生成选项列表
+            function generateOptionList() {
+                optionList.innerHTML = '';
+                
+                wheelOptions.forEach((option, index) => {
+                    const optionItem = document.createElement('div');
+                    optionItem.className = 'option-item';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = `wheel-option-${index}`;
+                    input.name = `wheel-option-${index}`;
+                    input.value = option;
+                    input.placeholder = '输入选项内容';
+                    input.addEventListener('input', function() {
+                        wheelOptions[index] = this.value;
+                    });
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-option';
+                    removeBtn.id = `remove-option-${index}`;
+                    removeBtn.textContent = '×';
+                    removeBtn.addEventListener('click', function() {
+                        if (wheelOptions.length > 2) {
+                            wheelOptions.splice(index, 1);
+                            generateOptionList();
+                            generateWheel();
+                        } else {
+                            alert('至少需要2个选项！');
+                        }
+                    });
+                    
+                    optionItem.appendChild(input);
+                    optionItem.appendChild(removeBtn);
+                    optionList.appendChild(optionItem);
+                });
+            }
+            
+            // 转动转盘
+            wheelBtn.addEventListener('click', function() {
+                // 生成随机角度，每次至少转5圈（1800度），然后加上随机角度
+                const additionalRotation = Math.floor(Math.random() * 360) + 1800;
+                const targetRotation = currentRotation + additionalRotation;
+                
+                // 清除之前的结果
+                resultDiv.textContent = '';
+                
+                // 使用requestAnimationFrame实现平滑旋转，确保顺时针方向
+                let startTime = null;
+                const duration = 4000; // 增加旋转持续时间到4秒，让用户有足够时间观察
+                const startRotation = currentRotation;
+                
+                function animateRotation(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
+                    
+                    // 使用更强的ease-out缓动函数，让停止更加明显
+                    const easeOutProgress = 1 - Math.pow(1 - progress, 6); // 增加缓动指数到6，使减速更明显
+                    const currentProgressRotation = startRotation + (targetRotation - startRotation) * easeOutProgress;
+                    wheel.style.transform = `rotate(${currentProgressRotation}deg)`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateRotation);
+                    } else {
+                        // 动画结束，确保转盘精确停在目标位置
+                        wheel.style.transform = `rotate(${targetRotation}deg)`;
+                        
+                        // 确保currentRotation精确更新
+                        currentRotation = targetRotation;
+                        
+                        // 增加延迟时间，确保用户清楚看到转盘已经完全停止
+                        setTimeout(() => {
+                            // 计算最终角度相对于360度的余数
+                            const finalDegrees = currentRotation % 360;
+                            // 计算结果索引
+                            const resultIndex = Math.floor((360 - finalDegrees) / (360 / wheelOptions.length)) % wheelOptions.length;
+                            const result = wheelOptions[resultIndex];
+                            resultDiv.textContent = `🎉 恭喜你获得：${result}`;
+                            
+                            // 保存游戏结果到历史记录
+                            try {
+                                wheelAPI.saveWheelHistory(result);
+                            } catch (error) {
+                                console.error('保存游戏历史失败:', error);
+                            }
+                        }, 300); // 300毫秒延迟，让用户清晰看到转盘停止
+                    }
+                }
+                
+                requestAnimationFrame(animateRotation);
+            });
+            
+            // 重置转盘
+            resetBtn.addEventListener('click', function() {
+                currentRotation = 0;
+                wheel.style.transform = 'rotate(0deg)';
+                resultDiv.textContent = '';
+            });
+            
+            // 添加选项
+            addOptionBtn.addEventListener('click', function() {
+                wheelOptions.push('新选项');
+                generateOptionList();
+                generateWheel();
+            });
+            
+            // 保存设置
+            saveSettingsBtn.addEventListener('click', async function() {
+                const schemeName = schemeNameInput.value.trim();
+                if (!schemeName) {
+                    alert('请输入方案名称！');
+                    return;
+                }
+                
+                console.log('保存方案参数:', {
+                    currentSchemeId: currentSchemeId,
+                    schemeName: schemeName,
+                    wheelOptions: wheelOptions,
+                    theme: theme
+                });
+                
+                try {
+                    const result = await wheelAPI.saveWheelSettings(currentSchemeId, schemeName, wheelOptions, theme);
+                    console.log('保存方案结果:', result);
+                    
+                    // 更新currentSchemeId，以便在重新加载方案列表时能正确显示当前方案
+                    if (result.scheme) {
+                        currentSchemeId = result.scheme.id;
+                    }
+                    
+                    alert('方案已保存！');
+                    // 重新加载方案列表
+                    await loadWheelSettings();
+                } catch (error) {
+                    console.error('保存方案失败:', error);
+                    alert('保存方案失败，请稍后重试！');
+                }
+            });
+            
+            // 方案选择下拉菜单变化事件
+            schemeSelect.addEventListener('change', function() {
+                selectScheme(this.value);
+            });
+            
+            // 删除方案按钮点击事件
+            deleteSchemeBtn.addEventListener('click', function() {
+                deleteScheme(currentSchemeId);
+            });
+            
+            // 主题颜色变更
+            themeColor.addEventListener('change', function() {
+                theme = this.value;
+                generateWheel();
+            });
+            
+            // 初始化
+            loadWheelSettings();
+        });
+    </script>
+</body>
+</html>
