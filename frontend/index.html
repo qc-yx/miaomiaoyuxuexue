@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多功能应用 - GitHub Pages版</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 添加iOS优化的meta标签 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多功能应用">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 多功能应用</h1>
+            <p class="subtitle">GitHub Pages 纯前端版本</p>
+            <div class="auth-status" id="authStatus">
+                <span id="currentUser">游客</span>
+                <button id="logoutBtn" style="display: none;">退出</button>
+            </div>
+        </header>
+
+        <!-- 登录/注册区域 -->
+        <div id="authSection" class="auth-section">
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">登录</button>
+                <button class="tab-btn" data-tab="register">注册</button>
+            </div>
+            
+            <div id="loginTab" class="auth-form">
+                <h3>用户登录</h3>
+                <form id="loginForm">
+                    <label for="loginUsername" style="display: block; margin-bottom: 5px; font-weight: 600;">用户名:</label>
+                    <input type="text" id="loginUsername" placeholder="用户名" required>
+                    <label for="loginPassword" style="display: block; margin-bottom: 5px; font-weight: 600;">密码:</label>
+                    <input type="password" id="loginPassword" placeholder="密码" required>
+                    <button type="submit">登录</button>
+                </form>
+            </div>
+            
+            <div id="registerTab" class="auth-form" style="display: none;">
+                <h3>用户注册</h3>
+                <form id="registerForm">
+                    <label for="registerUsername" style="display: block; margin-bottom: 5px; font-weight: 600;">用户名:</label>
+                    <input type="text" id="registerUsername" placeholder="用户名" required>
+                    <label for="registerPassword" style="display: block; margin-bottom: 5px; font-weight: 600;">密码:</label>
+                    <input type="password" id="registerPassword" placeholder="密码" required>
+                    <label for="registerConfirmPassword" style="display: block; margin-bottom: 5px; font-weight: 600;">确认密码:</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="确认密码" required>
+                    <button type="submit">注册</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 主功能区域 -->
+        <div id="mainSection" class="main-section" style="display: none;">
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="lists">📋 共享清单</button>
+                <button class="nav-tab" data-tab="notes">📝 笔记</button>
+                <button class="nav-tab" data-tab="exercises">💪 运动</button>
+                <button class="nav-tab" data-tab="cuisine">🍽️ 饮食</button>
+                <button class="nav-tab" data-tab="wheel">🎲 转盘</button>
+            </nav>
+
+            <!-- 共享清单功能 -->
+            <div id="listsTab" class="tab-content active">
+                <div class="section-header">
+                    <h2>📋 共享清单</h2>
+                    <button id="createListBtn" class="btn-primary">创建新清单</button>
+                </div>
+                <div id="listsContainer" class="lists-container"></div>
+                
+                <!-- 创建清单模态框 -->
+                <div id="createListModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>创建新清单</h3>
+                        <form id="createListForm">
+                            <label for="listName" style="display: block; margin-bottom: 5px; font-weight: 600;">清单名称:</label>
+                            <input type="text" id="listName" placeholder="清单名称" required>
+                            <textarea id="listDescription" placeholder="清单描述"></textarea>
+                            <button type="submit">创建清单</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 笔记功能 -->
+            <div id="notesTab" class="tab-content">
+                <div class="section-header">
+                    <h2>📝 笔记</h2>
+                    <label for="noteDate" style="display: block; margin-bottom: 5px; font-weight: 600;">选择日期:</label>
+                    <input type="date" id="noteDate" class="date-input">
+                </div>
+                <div class="note-editor">
+                    <textarea id="noteContent" placeholder="在这里写下您的笔记..." rows="15"></textarea>
+                    <div class="note-actions">
+                        <button id="saveNoteBtn" class="btn-primary">保存笔记</button>
+                        <button id="clearNoteBtn" class="btn-secondary">清空</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 运动功能 -->
+            <div id="exercisesTab" class="tab-content">
+                <div class="section-header">
+                    <h2>💪 运动记录</h2>
+                    <button id="addExerciseBtn" class="btn-primary">添加运动</button>
+                </div>
+                <div id="exercisesContainer" class="exercises-container"></div>
+                
+                <!-- 添加运动模态框 -->
+                <div id="addExerciseModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>添加运动</h3>
+                        <form id="addExerciseForm">
+                            <label for="exerciseName" style="display: block; margin-bottom: 5px; font-weight: 600;">运动名称:</label>
+                            <input type="text" id="exerciseName" placeholder="运动名称" required>
+                            <select id="exerciseType" required>
+                                <option value="">选择类型</option>
+                                <option value="有氧运动">有氧运动</option>
+                                <option value="力量训练">力量训练</option>
+                                <option value="柔韧性">柔韧性</option>
+                                <option value="其他">其他</option>
+                            </select>
+                            <label for="exerciseDuration" style="display: block; margin-bottom: 5px; font-weight: 600;">持续时间(分钟):</label>
+                            <input type="number" id="exerciseDuration" placeholder="持续时间(分钟)" min="1" required>
+                            <select id="exerciseIntensity" required>
+                                <option value="">选择强度</option>
+                                <option value="低">低</option>
+                                <option value="中">中</option>
+                                <option value="高">高</option>
+                            </select>
+                            <button type="submit">添加运动</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 饮食功能 -->
+            <div id="cuisineTab" class="tab-content">
+                <div class="section-header">
+                    <h2>🍽️ 饮食记录</h2>
+                    <button id="addCuisineBtn" class="btn-primary">添加饮食</button>
+                </div>
+                <div id="cuisineContainer" class="cuisine-container"></div>
+                
+                <!-- 添加饮食模态框 -->
+                <div id="addCuisineModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>添加饮食</h3>
+                        <form id="addCuisineForm">
+                            <label for="cuisineName" style="display: block; margin-bottom: 5px; font-weight: 600;">食物名称:</label>
+                            <input type="text" id="cuisineName" placeholder="食物名称" required>
+                            <select id="cuisineType" required>
+                                <option value="">选择类型</option>
+                                <option value="早餐">早餐</option>
+                                <option value="午餐">午餐</option>
+                                <option value="晚餐">晚餐</option>
+                                <option value="零食">零食</option>
+                                <option value="其他">其他</option>
+                            </select>
+                            <label for="cuisineCalories" style="display: block; margin-bottom: 5px; font-weight: 600;">卡路里:</label>
+                            <input type="number" id="cuisineCalories" placeholder="卡路里" min="0" required>
+                            <label for="cuisineDate" style="display: block; margin-bottom: 5px; font-weight: 600;">日期:</label>
+                            <input type="date" id="cuisineDate" required>
+                            <button type="submit">添加饮食</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 转盘功能 -->
+            <div id="wheelTab" class="tab-content">
+                <div class="section-header">
+                    <h2>🎲 转盘</h2>
+                    <button id="createWheelBtn" class="btn-primary">创建转盘</button>
+                </div>
+                <div id="wheelsContainer" class="wheels-container"></div>
+                
+                <!-- 转盘模态框 -->
+                <div id="wheelModal" class="modal">
+                    <div class="modal-content large">
+                        <span class="close">&times;</span>
+                        <h3 id="wheelTitle">转盘</h3>
+                        <div class="wheel-container">
+                            <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                            <div id="wheelResult" class="wheel-result"></div>
+                        </div>
+                        <div class="wheel-controls">
+                            <button id="spinBtn" class="btn-primary">开始转动</button>
+                            <button id="resetWheelBtn" class="btn-secondary">重置</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 创建转盘模态框 -->
+                <div id="createWheelModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>创建转盘</h3>
+                        <form id="createWheelForm">
+                            <label for="wheelName" style="display: block; margin-bottom: 5px; font-weight: 600;">转盘名称:</label>
+                            <input type="text" id="wheelName" placeholder="转盘名称" required>
+                            <textarea id="wheelItems" placeholder="输入选项，每行一个" rows="6" required></textarea>
+                            <button type="submit">创建转盘</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // GitHub Pages 专用主脚本
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 GitHub Pages 版本加载成功');
+            
+            // 全局状态
+            let currentUser = null;
+            let currentTab = 'lists';
+            
+            // 初始化
+            initAuth();
+            
+            // 认证相关功能
+            function initAuth() {
+                // 检查登录状态
+                if (authAPI.isLoggedIn()) {
+                    currentUser = authAPI.getCurrentUser();
+                    showMainSection();
+                } else {
+                    showAuthSection();
+                }
+                
+                // 登录表单
+                document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const username = document.getElementById('loginUsername').value;
+                    const password = document.getElementById('loginPassword').value;
+                    
+                    try {
+                        const result = await authAPI.login(username, password);
+                        if (result.success) {
+                            currentUser = result.user;
+                            showMainSection();
+                            console.log('登录成功！');
+                        } else {
+                            console.log('登录失败：' + result.message);
+                        }
+                    } catch (error) {
+                        console.error('登录错误：' + error.message);
+                    }
+                });
+                
+                // 注册表单
+                document.getElementById('registerForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const username = document.getElementById('registerUsername').value;
+                    const password = document.getElementById('registerPassword').value;
+                    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                    
+                    if (password !== confirmPassword) {
+                        console.log('两次输入的密码不一致！');
+                        return;
+                    }
+                    
+                    try {
+                        const result = await authAPI.register(username, password);
+                        if (result.success) {
+                            currentUser = result.user;
+                            showMainSection();
+                            console.log('注册成功！');
+                        } else {
+                            console.log('注册失败：' + result.message);
+                        }
+                    } catch (error) {
+                        console.error('注册错误：' + error.message);
+                    }
+                });
+                
+                // 标签切换
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const tab = this.dataset.tab;
+                        switchAuthTab(tab);
+                    });
+                });
+                
+                // 退出登录
+                document.getElementById('logoutBtn').addEventListener('click', function() {
+                    authAPI.logout();
+                    currentUser = null;
+                    showAuthSection();
+                });
+            }
+            
+            function switchAuthTab(tab) {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+                
+                document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+                document.getElementById(tab + 'Tab').style.display = 'block';
+            }
+            
+            function showAuthSection() {
+                document.getElementById('authSection').style.display = 'block';
+                document.getElementById('mainSection').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+            }
+            
+            function showMainSection() {
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('mainSection').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                
+                if (currentUser) {
+                    document.getElementById('currentUser').textContent = currentUser.username;
+                }
+                
+                // 初始化主功能
+                initMainFeatures();
+            }
+            
+            // 主功能初始化
+            function initMainFeatures() {
+                // 导航标签切换
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const tabName = this.dataset.tab;
+                        switchTab(tabName);
+                    });
+                });
+                
+                // 初始化各功能模块
+                initLists();
+                initNotes();
+                initExercises();
+                initCuisine();
+                initWheel();
+                
+                // 模态框关闭功能
+                document.querySelectorAll('.close').forEach(closeBtn => {
+                    closeBtn.addEventListener('click', function() {
+                        this.closest('.modal').style.display = 'none';
+                    });
+                });
+            }
+            
+            function switchTab(tabName) {
+                document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                document.getElementById(tabName + 'Tab').classList.add('active');
+                
+                currentTab = tabName;
+            }
+            
+            // 清单功能
+            function initLists() {
+                loadLists();
+                
+                document.getElementById('createListBtn').addEventListener('click', function() {
+                    document.getElementById('createListModal').style.display = 'block';
+                });
+                
+                document.getElementById('createListForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('listName').value;
+                    const description = document.getElementById('listDescription').value;
+                    
+                    try {
+                        await sharedListsAPI.createList(name, description);
+                        document.getElementById('createListModal').style.display = 'none';
+                        document.getElementById('createListForm').reset();
+                        loadLists();
+                        alert('清单创建成功！');
+                    } catch (error) {
+                        alert('创建清单失败：' + error.message);
+                    }
+                });
+            }
+            
+            async function loadLists() {
+                try {
+                    const result = await sharedListsAPI.getLists();
+                    const lists = result.data || [];
+                    const container = document.getElementById('listsContainer');
+                    
+                    if (lists.length === 0) {
+                        container.innerHTML = '<p class="empty-message">暂无清单，点击上方按钮创建第一个清单</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = lists.map(list => `
+                        <div class="list-item">
+                            <h4>${list.name}</h4>
+                            <p>${list.description || '无描述'}</p>
+                            <div class="list-actions">
+                                <button class="btn-secondary" onclick="viewList(${list.id})">查看详情</button>
+                                <button class="btn-danger" onclick="deleteList(${list.id})">删除</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('加载清单失败:', error);
+                    document.getElementById('listsContainer').innerHTML = '<p class="error-message">加载清单失败</p>';
+                }
+            }
+            
+            // 笔记功能
+            function initNotes() {
+                const noteDate = document.getElementById('noteDate');
+                const today = new Date().toISOString().split('T')[0];
+                noteDate.value = today;
+                
+                loadNote(today);
+                
+                noteDate.addEventListener('change', function() {
+                    loadNote(this.value);
+                });
+                
+                document.getElementById('saveNoteBtn').addEventListener('click', async function() {
+                    const date = noteDate.value;
+                    const content = document.getElementById('noteContent').value;
+                    
+                    try {
+                        await notesAPI.saveNote(date, content);
+                        alert('笔记保存成功！');
+                    } catch (error) {
+                        alert('保存笔记失败：' + error.message);
+                    }
+                });
+                
+                document.getElementById('clearNoteBtn').addEventListener('click', function() {
+                    document.getElementById('noteContent').value = '';
+                });
+            }
+            
+            async function loadNote(date) {
+                try {
+                    const result = await notesAPI.getNote(date);
+                    document.getElementById('noteContent').value = result.data.content || '';
+                } catch (error) {
+                    console.error('加载笔记失败:', error);
+                    document.getElementById('noteContent').value = '';
+                }
+            }
+            
+            // 运动功能
+            function initExercises() {
+                loadExercises();
+                
+                document.getElementById('addExerciseBtn').addEventListener('click', function() {
+                    document.getElementById('addExerciseModal').style.display = 'block';
+                });
+                
+                document.getElementById('addExerciseForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('exerciseName').value;
+                    const type = document.getElementById('exerciseType').value;
+                    const duration = parseInt(document.getElementById('exerciseDuration').value);
+                    const intensity = document.getElementById('exerciseIntensity').value;
+                    
+                    try {
+                        await exercisesAPI.createExercise(name, type, duration, intensity);
+                        document.getElementById('addExerciseModal').style.display = 'none';
+                        document.getElementById('addExerciseForm').reset();
+                        loadExercises();
+                        alert('运动添加成功！');
+                    } catch (error) {
+                        alert('添加运动失败：' + error.message);
+                    }
+                });
+            }
+            
+            async function loadExercises() {
+                try {
+                    const result = await exercisesAPI.getExercises();
+                    const exercises = result.data || [];
+                    const container = document.getElementById('exercisesContainer');
+                    
+                    if (exercises.length === 0) {
+                        container.innerHTML = '<p class="empty-message">暂无运动记录，点击上方按钮添加第一个运动</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = exercises.map(exercise => `
+                        <div class="exercise-item">
+                            <h4>${exercise.name}</h4>
+                            <p>类型: ${exercise.type}</p>
+                            <p>时长: ${exercise.duration}分钟</p>
+                            <p>强度: ${exercise.intensity}</p>
+                            <div class="exercise-actions">
+                                <button class="btn-danger" onclick="deleteExercise(${exercise.id})">删除</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('加载运动失败:', error);
+                    document.getElementById('exercisesContainer').innerHTML = '<p class="error-message">加载运动失败</p>';
+                }
+            }
+            
+            // 饮食功能
+            function initCuisine() {
+                loadCuisines();
+                
+                document.getElementById('addCuisineBtn').addEventListener('click', function() {
+                    document.getElementById('addCuisineModal').style.display = 'block';
+                });
+                
+                document.getElementById('addCuisineForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('cuisineName').value;
+                    const type = document.getElementById('cuisineType').value;
+                    const calories = parseInt(document.getElementById('cuisineCalories').value);
+                    const date = document.getElementById('cuisineDate').value;
+                    
+                    try {
+                        await cuisineAPI.createCuisine(name, type, calories, date);
+                        document.getElementById('addCuisineModal').style.display = 'none';
+                        document.getElementById('addCuisineForm').reset();
+                        loadCuisines();
+                        alert('饮食添加成功！');
+                    } catch (error) {
+                        alert('添加饮食失败：' + error.message);
+                    }
+                });
+            }
+            
+            async function loadCuisines() {
+                try {
+                    const result = await cuisineAPI.getCuisines();
+                    const cuisines = result.data || [];
+                    const container = document.getElementById('cuisineContainer');
+                    
+                    if (cuisines.length === 0) {
+                        container.innerHTML = '<p class="empty-message">暂无饮食记录，点击上方按钮添加第一个饮食</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = cuisines.map(cuisine => `
+                        <div class="cuisine-item">
+                            <h4>${cuisine.name}</h4>
+                            <p>类型: ${cuisine.type}</p>
+                            <p>卡路里: ${cuisine.calories}</p>
+                            <p>日期: ${cuisine.date}</p>
+                            <div class="cuisine-actions">
+                                <button class="btn-danger" onclick="deleteCuisine(${cuisine.id})">删除</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('加载饮食失败:', error);
+                    document.getElementById('cuisineContainer').innerHTML = '<p class="error-message">加载饮食失败</p>';
+                }
+            }
+            
+            // 转盘功能
+            function initWheel() {
+                loadWheels();
+                
+                document.getElementById('createWheelBtn').addEventListener('click', function() {
+                    document.getElementById('createWheelModal').style.display = 'block';
+                });
+                
+                document.getElementById('createWheelForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('wheelName').value;
+                    const itemsText = document.getElementById('wheelItems').value;
+                    const items = itemsText.split('\n').filter(item => item.trim());
+                    
+                    if (items.length < 2) {
+                        alert('至少需要2个选项');
+                        return;
+                    }
+                    
+                    try {
+                        await wheelAPI.createWheel(name, items);
+                        document.getElementById('createWheelModal').style.display = 'none';
+                        document.getElementById('createWheelForm').reset();
+                        loadWheels();
+                        alert('转盘创建成功！');
+                    } catch (error) {
+                        alert('创建转盘失败：' + error.message);
+                    }
+                });
+            }
+            
+            async function loadWheels() {
+                try {
+                    const result = await wheelAPI.getWheels();
+                    const wheels = result.data || [];
+                    const container = document.getElementById('wheelsContainer');
+                    
+                    if (wheels.length === 0) {
+                        container.innerHTML = '<p class="empty-message">暂无转盘，点击上方按钮创建第一个转盘</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = wheels.map(wheel => `
+                        <div class="wheel-item">
+                            <h4>${wheel.name}</h4>
+                            <p>选项数: ${wheel.items.length}</p>
+                            <div class="wheel-actions">
+                                <button class="btn-primary" onclick="openWheel(${wheel.id})">开始转动</button>
+                                <button class="btn-danger" onclick="deleteWheel(${wheel.id})">删除</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('加载转盘失败:', error);
+                    document.getElementById('wheelsContainer').innerHTML = '<p class="error-message">加载转盘失败</p>';
+                }
+            }
+            
+            // 全局函数供HTML调用
+            window.viewList = function(listId) {
+                alert('查看清单详情功能开发中...');
+            };
+            
+            window.deleteList = async function(listId) {
+                if (confirm('确定要删除这个清单吗？')) {
+                    try {
+                        await sharedListsAPI.deleteList(listId);
+                        loadLists();
+                        alert('清单删除成功！');
+                    } catch (error) {
+                        alert('删除清单失败：' + error.message);
+                    }
+                }
+            };
+            
+            window.deleteExercise = async function(id) {
+                if (confirm('确定要删除这条运动记录吗？')) {
+                    try {
+                        await exercisesAPI.deleteExercise(id);
+                        loadExercises();
+                        alert('运动记录删除成功！');
+                    } catch (error) {
+                        alert('删除运动记录失败：' + error.message);
+                    }
+                }
+            };
+            
+            window.deleteCuisine = async function(id) {
+                if (confirm('确定要删除这条饮食记录吗？')) {
+                    try {
+                        await cuisineAPI.deleteCuisine(id);
+                        loadCuisines();
+                        alert('饮食记录删除成功！');
+                    } catch (error) {
+                        alert('删除饮食记录失败：' + error.message);
+                    }
+                }
+            };
+            
+            window.playWheel = function(id) {
+                alert('转盘功能开发中...');
+            };
+            
+            window.deleteWheel = async function(id) {
+                if (confirm('确定要删除这个转盘吗？')) {
+                    try {
+                        await wheelAPI.deleteWheel(id);
+                        loadWheels();
+                        alert('转盘删除成功！');
+                    } catch (error) {
+                        alert('删除转盘失败：' + error.message);
+                    }
+                }
+            };
+        });
+    </script>
+</body>
+</html>
