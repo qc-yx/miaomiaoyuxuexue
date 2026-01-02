@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📨 邀请系统</title>
+    <!-- 添加PWA优化的meta标签 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多功能应用">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('./images/picture/2/bd7a789b07d5d83d0bdedb57234fd252.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 页面容器 */
+        .container {
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 表单容器 */
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 30px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 表单组 */
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        /* 表单标签 */
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        /* 表单输入框 */
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            width: 100%;
+            padding: 15px 24px;
+            background: rgba(76, 175, 80, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            color: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            display: block;
+            width: 100%;
+            margin: 20px 0 0;
+            padding: 12px 24px;
+            background: rgba(245, 101, 101, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(245, 101, 101, 0.4);
+            color: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(252, 129, 129, 0.4);
+        }
+
+        /* 结果信息 */
+        .result-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .result-message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            color: rgba(255, 255, 255, 0.95);
+            display: block;
+        }
+
+        .result-message.error {
+            background: rgba(245, 101, 101, 0.2);
+            border: 1px solid rgba(245, 101, 101, 0.4);
+            color: rgba(255, 255, 255, 0.95);
+            display: block;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .form-container {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="page-title">邀请码</h1>
+            
+            <!-- 用户自己的邀请码区域 -->
+            <div class="form-group">
+                <label>您的邀请码</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="text" id="my-invite-code" readonly placeholder="正在生成...">
+                    <button type="button" id="copy-code-btn" class="submit-btn" style="width: auto; padding: 10px 15px; font-size: 14px;">
+                        复制
+                    </button>
+                </div>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 12px; margin-top: 8px; text-align: center;">
+                    分享此邀请码给他人，对方输入后即可绑定邀请关系
+                </p>
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 25px 0;">
+            
+            <!-- 绑定他人邀请码表单 -->
+            <form id="invite-form">
+                <div class="form-group">
+                    <label for="invite-code">绑定他人邀请码</label>
+                    <input type="text" id="invite-code" name="inviteCode" placeholder="请输入他人的邀请码">
+                </div>
+                
+                <button type="submit" class="submit-btn">绑定邀请码</button>
+            </form>
+            
+            <a href="main.html" class="back-btn">返回多功能应用</a>
+            
+            <div id="result-message" class="result-message"></div>
+        </div>
+    </div>
+    
+    <!-- 引入API脚本 -->
+    <script src="script-github-pages.js"></script>
+    
+    <script>
+        // 邀请码界面的JavaScript功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const inviteForm = document.getElementById('invite-form');
+            const resultMessage = document.getElementById('result-message');
+            const myInviteCodeInput = document.getElementById('my-invite-code');
+            const copyCodeBtn = document.getElementById('copy-code-btn');
+            let useLocalStorage = false;
+            
+            // 生成随机邀请码（用于LocalStorage降级方案）
+            function generateInviteCode() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = '';
+                for (let i = 0; i < 6; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return code;
+            }
+            
+
+            
+            // 从API加载用户的邀请码
+            async function loadMyInviteCode() {
+                try {
+                    const response = await inviteAPI.getMyInviteCode();
+                    myInviteCodeInput.value = response.code;
+                } catch (error) {
+                    console.error('加载邀请码失败:', error);
+                    // 提供默认值，避免UI出现问题
+                    myInviteCodeInput.value = '';
+                }
+            }
+            
+            // 初始化：加载邀请码
+            (async () => {
+                try {
+                    await loadMyInviteCode();
+                } catch (error) {
+                    console.error('初始化失败:', error);
+                }
+            })();
+            
+            // 复制邀请码功能
+            copyCodeBtn.addEventListener('click', function() {
+                myInviteCodeInput.select();
+                document.execCommand('copy');
+                
+                // 显示复制成功提示
+                const originalText = copyCodeBtn.textContent;
+                copyCodeBtn.textContent = '已复制！';
+                copyCodeBtn.style.background = 'rgba(76, 175, 80, 0.4)';
+                
+                setTimeout(() => {
+                    copyCodeBtn.textContent = originalText;
+                    copyCodeBtn.style.background = 'rgba(76, 175, 80, 0.2)';
+                }, 1500);
+            });
+            
+            // 绑定他人邀请码的逻辑
+            inviteForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const inviteCode = document.getElementById('invite-code').value.trim();
+                
+                if (!inviteCode) {
+                    resultMessage.textContent = '请输入邀请码';
+                    resultMessage.className = 'result-message error';
+                    return;
+                }
+                
+                // 防止绑定自己的邀请码
+                if (inviteCode === myInviteCodeInput.value) {
+                    resultMessage.textContent = '❌ 不能绑定自己的邀请码！';
+                    resultMessage.className = 'result-message error';
+                    return;
+                }
+                
+                try {
+                    // 使用API绑定邀请码
+                    await inviteAPI.useInviteCode(inviteCode);
+                    resultMessage.textContent = '🎉 邀请码绑定成功！';
+                    resultMessage.className = 'result-message success';
+                    
+                    // 清空输入框
+                    document.getElementById('invite-code').value = '';
+                } catch (error) {
+                    console.error('绑定邀请码失败:', error);
+                    resultMessage.textContent = '❌ 绑定邀请码失败，请稍后重试！';
+                    resultMessage.className = 'result-message error';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
