@@ -81,7 +81,8 @@ app.use('/api/counters', countersRoutes);
 
 // 静态文件服务 - 提供前端文件
 const path = require('path');
-app.use(express.static(path.join(__dirname, '../../')));
+// 使用process.cwd()获取项目根目录，更适合Vercel环境
+app.use(express.static(path.join(process.cwd(), '')));
 
 // 处理SPA路由 - 所有非API请求都返回index.html
 app.use((req, res, next) => {
