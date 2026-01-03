@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "temp-next/backend/server.js",
+      "src": "index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "temp-next/backend/server.js"
+      "dest": "index.js"
     }
   ],
   "installCommand": "npm install"
